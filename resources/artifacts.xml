@@ -1,0 +1,111 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?artifactRepository version='1.1.0'?>
+<repository name='AppWrench' type='org.eclipse.equinox.p2.artifact.repository.simpleRepository' version='1'>
+  <properties size='2'>
+    <property name='p2.timestamp' value='1337880100226'/>
+    <property name='p2.compressed' value='true'/>
+  </properties>
+  <mappings size='3'>
+    <rule filter='(&amp; (classifier=osgi.bundle))' output='${repoUrl}/plugins/${id}_${version}.jar'/>
+    <rule filter='(&amp; (classifier=binary))' output='${repoUrl}/binary/${id}_${version}'/>
+    <rule filter='(&amp; (classifier=org.eclipse.update.feature))' output='${repoUrl}/features/${id}_${version}.jar'/>
+  </mappings>
+  <artifacts size='16'>
+    <artifact classifier='osgi.bundle' id='com.onpositive.gae.profiler.epl' version='1.3.9.201205250021'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='386993'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.onpositive.ui.commons.tools' version='1.3.9.201205250021'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='96052'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.onpositive.semantic.model' version='1.3.9.201104121317'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='217533'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.onpositive.gae.console' version='1.3.9.201205250021'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='62379'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.onpositive.commons.platform' version='1.3.9.201104121317'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='57863'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.onpositive.google.appengine.tools' version='1.3.9.201205250021'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='3369411'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.onpositive.commons.platform.equinox' version='1.0.0.201104121317'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='10481'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.onpositive.google.api.repackaged' version='1.3.9.201205250021'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='4182549'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.onpositive.semantic.model.impl' version='1.3.9.201010221147'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='45317'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.onpositive.gae.profiler' version='1.3.9.201205250021'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='597780'/>
+      </properties>
+    </artifact>
+    <artifact classifier='org.eclipse.update.feature' id='com.onpositive.gae.appwrench' version='1.5.0'>
+      <properties size='2'>
+        <property name='download.contentType' value='application/zip'/>
+        <property name='download.size' value='3992'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.onpositive.gae.base.manager' version='1.3.9.201205250021'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='679812'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.onpositive.charting' version='1.3.9.201205250021'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='476217'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.onpositive.profiler.core' version='1.3.9.201205250021'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='24911'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.onpositive.semantic.ui' version='1.3.9.201104121317'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='609764'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='com.onpositive.gae.tools.core' version='1.3.9.201205250021'>
+      <properties size='2'>
+        <property name='artifact.size' value='4096'/>
+        <property name='download.size' value='1171259'/>
+      </properties>
+    </artifact>
+  </artifacts>
+</repository>
