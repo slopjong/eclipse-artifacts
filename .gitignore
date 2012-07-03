@@ -1,0 +1,6 @@
+Makefile
+*.pro.user
+*.o
+./eclipse-artifacts
+eclipse-artifacts
+qrc_artifacts.cpp
