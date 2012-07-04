@@ -6,8 +6,6 @@
 #include <QtCore/QStringList>
 #include <QtCore/QTextStream>
 
-#include <QDebug>
-
 #include <QtXmlPatterns/QXmlNodeModelIndex>
 #include <QtXmlPatterns/QSimpleXmlNodeModel>
 #include <QtXmlPatterns/QXmlQuery>
@@ -72,9 +70,9 @@ int main(int argc, char *argv[])
 
             QStringList tmpResults;
             if(tmpQuery.evaluateTo(&tmpResults))
-                qDebug() << tmpResults.first();
+                cout << tmpResults.first() << endl;
             else
-                qDebug() << "Could not evaluate the query";
+                cout << "Could not evaluate the query";
 
             item = results.next();
         }
