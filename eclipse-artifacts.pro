@@ -19,7 +19,7 @@ LIBS += -lz
 
 SOURCES += main.cpp
 
-RESOURCES += \
+OTHER_FILES += \
     resources/artifacts.xml \
     resources/feature.xml \
     resources/com.onpositive.gae.appwrench_1.5.0.jar \
