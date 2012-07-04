@@ -3,4 +3,5 @@ Makefile
 *.o
 ./eclipse-artifacts
 eclipse-artifacts
-qrc_artifacts.cpp
+qrc_*.cpp
+moc_*.cpp
