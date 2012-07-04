@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.onpositive.gae.appwrench"
+      label="App Wrench"
+      version="1.5"
+      provider-name="OnPositive Technologies, LLC">
+
+   <description url="http://www.onpositive.com">
+      AppWrench provide DataStore viewer,Java console, App-Engine profiler and other tools for Google
+App Engine.
+   </description>
+
+   <copyright>
+      (c) Copyright OnPositive Technologies, LLC. 2009-2010.  All rights
+reserved.
+   </copyright>
+
+   <license>
+      End User License Agreement:
+
+ CAREFULLY READ THIS LICENSE  BEFORE USING THE SOFTWARE. REGARDLESS OF HOW YOU ACQUIRE THE SOFTWARE USING THE SOFTWARE SHALL INDICATE YOUR ACCEPTANCE OF THE TERMS AND CONDITIONS CONTAINED IN THIS AGREEMENT. IF YOU DO NOT AGREE TO THE TERMS AND CONDITIONS OF THIS AGREEMENT AND THE TERMS AND CONDITIONS, YOU MAY NOT DOWNLOAD, INSTALL OR USE THE SOFTWARE.
+
+1.0 Definitions. 
+   
+   1.1)&apos;Licensor&apos; means OnPositive Technologies L.L.C.; 
+   
+   1.2)&apos;Subscriber&apos; means registered user of AppWrench who&apos;s dues have been paid in full; 
+   
+   1.3)&apos;Update&apos; shall refer to maintenance releases specific to the License, as they will be made by Licensor under no obligation or commitment to do so; 
+   
+   1.4)&apos;License&apos; shall mean the release version as designated on the distribution media; 
+   
+   1.5)&apos;Term&apos; refers to the effective duration of the license agreement and is effective for 12 months following possession of this software.
+
+2.0 License. The License, including all content, is protected by copyright under United States, foreign laws and international treaties. Unauthorized use of the License may violate copyright, trademark and other laws. Licensor grants Subscriber the non-exclusive, non-transferable right and license to permit one End User the use of the license on computer workstations located at his/her normal places of business, during the Term and subject to the terms and conditions of this Software License Agreement. Licensor will provide Maintenance updates of the License to Subscriber during the Term at no additional charge. The terms of this Software License Agreement will apply to all Updates provided to Subscriber. This grant is not a transfer of title, and under this license Subscriber may not: a) use, republish, upload, post or transmit in any way the License or any Content except as expressly authorized pursuant to this Software License Agreement; b) copy, reproduce, modify or create derivative works from the Content except as expressly authorized pursuant to this Software License Agreement; c) attempt to decompile, disassemble or reverse engineer any software contained within the License; d) remove any copyright or other proprietary notations from the Content; e) distribute, transfer, sale, lease, sublicense, assign or otherwise make available, directly or indirectly, the License or any Content, in part or in whole, including any search output or results, to any other person; f) except as may be specifically provided in this Software License Agreement, permit the Software to be accessed through an electronic network beyond Subscriber&apos;s normal places of business; or g) transfer the Content to another person or &apos;mirror&apos; the Content on external servers. 
+
+3.0 Limitation of Liability. Licensor assumes no responsibility for the selection of the License to achieve any intended purpose, for the proper use of License or for verifying the results obtained from use of the License. We warrant that for a period of 90 days after delivery of this copy of the Software: 
+ a) the media on which this copy of the Software is provided to you will be free from defects in materials and workmanship under normal use, and b) the Software will perform in substantial accordance with the Documentation. 
+ 
+ To the extent permitted by applicable law, The foregoing limited warranty is in lieu of all other warranties or conditions, express or implied, and we disclaim any and all implied warranties or conditions, including any implied warranty of title, non-infringement, merchantability or fitness for a particular purpose, regardless of whether we know or had reason to know of your particular needs. 
+ 
+ Some states do not allow the limitation or exclusion of liability for incidental or consequential damages, so the above limitation may not apply to you. Licensor entire liability and Subscriber exclusive remedy for breach of the foregoing warranty shall be, at our option, to either: a) return the price you paid, or b) repair or replace the Software or media that does not meet the foregoing warranty if it is returned to us with a copy of your receipt. In no event will Licensor be liable to you for any damages, including any lost profits, lost savings, or other incidental or consequential damages arising from the use or the inability to use the software, or for any claim by any other party. 
+
+4.0 Termination of Agreement. This license agreement takes effect upon your use of the software and remains effective until terminated. This Software License Agreement shall immediately and automatically terminate without notice or any other act upon i) the expiry of the Term; ii) the attempted illegal copying, distribution, transfer, assignment, lease or sale of the License, or rights thereto, without the prior written consent of Licensor; or iii) notice in writing given by one party to the other upon the violation by that party of any provision of this Agreement. Upon termination of this Software License Agreement, Subscriber will forthwith cease use of the License and destroy all of the original and copied Software Any and all use of the License by Subscriber following termination of this Software License Agreement is prohibited.
+
+5.0 Confidentiality. The Software contains trade secrets and proprietary know-how that belong to the Licensor and it is being made available to you in strict confidence. Any use or disclosure of the software, or of its algorithms, protocols or interfaces, other than in strict accordance with this license agreement may be actionable as a violation of licensor trade secret rights.
+
+6.0 Indemnity. Subscriber will indemnify Licensor and hold them harmless from and against any and all claims which a third party may assert against Licensor by reason of or as a consequence of Subscribers use of the License.
+
+7.0 General Provisions. This Software License Agreement constitute the entire agreement between the parties and supersede all prior agreements and understandings, oral and written, express or implied, by and between any of the parties with respect to the subject matter of this Agreement. No amendment or modification of this Software License Agreement shall be binding unless in writing and signed by a duly authorized representative of both parties. This Software License Agreement shall be governed by and construed in accordance with the laws of the State of Texas and federal laws of the United States. Any actions at law or in equity arising out of or in relation to this license Agreement may be filed only in the U.S. District Court in the State of Texas, U.S.A. and Subscriber hereby consents and submits to the personal jurisdiction of such court. If any one or more of the provisions contained in this Software License Agreement should be invalid, illegal or unenforceable in any respect in any jurisdiction, the validity, legality and enforceability of such provision or provisions shall not in any way be affected or impaired as a result of such event in any other jurisdiction and the validity, legality and enforceability of the remaining provisions contained in this Agreement shall not in any way be affected or impaired as a result of such event, unless in either case as a result of such determination this Agreement would fail in its essential purpose.
+
+8.0 Copyright and Trademark Notices. All Content is (c) Copyright OnPositive Technologies, LLC. 2009,
+3803 MT BONNELL RD Austin, TX 2221 . Any rights not expressly granted herein are reserved to the Licensor.
+   </license>
+
+   <url>
+      <update label="AppWrench update site" url="http://appwrench.onpositive.com/updatesite"/>
+   </url>
+
+   <requires>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.swt"/>
+      <import plugin="org.eclipse.jface"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="com.onpositive.gae.tools.core" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.jdt.ui"/>
+      <import plugin="org.eclipse.jdt.core"/>
+      <import plugin="com.onpositive.google.api.repackaged" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.onpositive.ui.commons.tools" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="com.onpositive.semantic.model" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.onpositive.semantic.ui" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.onpositive.commons.platform" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.forms"/>
+      <import plugin="org.eclipse.jface.text"/>
+      <import plugin="org.eclipse.debug.core"/>
+      <import plugin="org.apache.commons.httpclient" version="3.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.editors"/>
+      <import plugin="org.eclipse.jdt.debug.ui"/>
+      <import plugin="org.eclipse.jdt.launching"/>
+      <import plugin="org.eclipse.core.expressions"/>
+      <import plugin="org.eclipse.debug.ui"/>
+      <import plugin="com.google.appengine.eclipse.core"/>
+      <import plugin="com.google.gwt.eclipse.core"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="com.onpositive.gae.base.manager" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="com.onpositive.gae.base.manager" version="1.1.0" match="greaterOrEqual"/>
+      <import plugin="javax.servlet"/>
+      <import plugin="com.google.gdt.eclipse.core"/>
+      <import plugin="org.eclipse.core.filebuffers"/>
+      <import plugin="org.eclipse.jdt.debug"/>
+      <import plugin="org.eclipse.ui.console"/>
+      <import plugin="org.eclipse.equinox.security"/>
+      <import plugin="org.eclipse.help"/>
+      <import plugin="org.apache.ant"/>
+      <import plugin="org.mortbay.jetty.util"/>
+      <import plugin="org.mortbay.jetty.server"/>
+      <import plugin="org.eclipse.ui.workbench.texteditor"/>
+      <import plugin="com.onpositive.semantic.model" version="1.2.0" match="greaterOrEqual"/>
+      <import plugin="com.onpositive.charting" version="1.1.0" match="greaterOrEqual"/>
+   </requires>
+
+   <plugin
+         id="com.onpositive.charting"
+         download-size="0"
+         install-size="0"
+         version="1.3.9.201205250021"
+         unpack="false"/>
+
+   <plugin
+         id="com.onpositive.commons.platform"
+         download-size="0"
+         install-size="0"
+         version="1.3.9.201104121317"
+         unpack="false"/>
+
+   <plugin
+         id="com.onpositive.gae.base.manager"
+         download-size="0"
+         install-size="0"
+         version="1.3.9.201205250021"
+         unpack="false"/>
+
+   <plugin
+         id="com.onpositive.gae.console"
+         download-size="0"
+         install-size="0"
+         version="1.3.9.201205250021"
+         unpack="false"/>
+
+   <plugin
+         id="com.onpositive.gae.profiler"
+         download-size="0"
+         install-size="0"
+         version="1.3.9.201205250021"
+         unpack="false"/>
+
+   <plugin
+         id="com.onpositive.gae.profiler.epl"
+         download-size="0"
+         install-size="0"
+         version="1.3.9.201205250021"
+         unpack="false"/>
+
+   <plugin
+         id="com.onpositive.gae.tools.core"
+         download-size="0"
+         install-size="0"
+         version="1.3.9.201205250021"
+         unpack="false"/>
+
+   <plugin
+         id="com.onpositive.google.api.repackaged"
+         download-size="0"
+         install-size="0"
+         version="1.3.9.201205250021"
+         unpack="false"/>
+
+   <plugin
+         id="com.onpositive.google.appengine.tools"
+         download-size="0"
+         install-size="0"
+         version="1.3.9.201205250021"
+         unpack="false"/>
+
+   <plugin
+         id="com.onpositive.profiler.core"
+         download-size="0"
+         install-size="0"
+         version="1.3.9.201205250021"
+         unpack="false"/>
+
+   <plugin
+         id="com.onpositive.semantic.model"
+         download-size="0"
+         install-size="0"
+         version="1.3.9.201104121317"
+         unpack="false"/>
+
+   <plugin
+         id="com.onpositive.semantic.model.impl"
+         download-size="0"
+         install-size="0"
+         version="1.3.9.201010221147"
+         unpack="false"/>
+
+   <plugin
+         id="com.onpositive.semantic.ui"
+         download-size="0"
+         install-size="0"
+         version="1.3.9.201104121317"
+         unpack="false"/>
+
+   <plugin
+         id="com.onpositive.ui.commons.tools"
+         download-size="0"
+         install-size="0"
+         version="1.3.9.201205250021"
+         unpack="false"/>
+
+   <plugin
+         id="com.onpositive.commons.platform.equinox"
+         download-size="0"
+         install-size="0"
+         version="1.0.0.201104121317"/>
+
+</feature>

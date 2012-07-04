@@ -4,6 +4,7 @@
 #
 #-------------------------------------------------
 
+
 QT       += core xmlpatterns xml network
 
 QT       -= gui
@@ -18,3 +19,6 @@ TEMPLATE = app
 SOURCES += main.cpp
 
 RESOURCES += resources/artifacts.xml
+
+OTHER_FILES += \
+    resources/feature.xml

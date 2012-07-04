@@ -6,6 +6,8 @@
 #include <QtCore/QStringList>
 #include <QtCore/QTextStream>
 
+#include <QDebug>
+
 #include <QtXmlPatterns/QXmlNodeModelIndex>
 #include <QtXmlPatterns/QSimpleXmlNodeModel>
 #include <QtXmlPatterns/QXmlQuery>
@@ -21,15 +23,15 @@ int main(int argc, char *argv[])
     QTextStream cout(stdout, QIODevice::WriteOnly);
     QFile sourceDocument;
 
-    QString file = "resources/artifacts.xml";
+    QString file = "resources/feature.xml";
 
     sourceDocument.setFileName(file);
 
     if(sourceDocument.open(QIODevice::ReadOnly))
     {
-        QXmlQuery query;
+        QXmlQuery query(QXmlQuery::XPath20);
         query.bindVariable("inputDocument", &sourceDocument);
-        query.setQuery("doc($inputDocument)/repository/mappings/rule");
+        query.setQuery("doc($inputDocument)/feature/plugin");
 
         if (!query.isValid())
         {
@@ -39,54 +41,43 @@ int main(int argc, char *argv[])
 
         QXmlResultItems results;
         query.evaluateTo(&results);
-        const QXmlItem item = results.next();
 
-        if (item.isNull())
+        QXmlItem item(results.next());
+        while(!item.isNull())
         {
-            cout << "query is null" << endl;
-            exit(1);
-        }
-        else if( item.isNode())
-        {
-            cout << "item is node" << endl;
-        }
-        else if( item.isAtomicValue())
-        {
-            cout << "item is atomic" << endl;
-        }
+            if (item.isNull())
+            {
+                cout << "query is null" << endl;
+                exit(1);
+            }
+            else if( item.isNode())
+            {
+                cout << "item is node" << endl;
+            }
+            else if( item.isAtomicValue())
+            {
+                cout << "item is atomic" << endl;
+            }
 
-        QXmlQuery tmpQuery;
+            QXmlQuery tmpQuery;
 
-        tmpQuery.bindVariable("ruleNode", item);
-        tmpQuery.setQuery("$ruleNode/filter");
+            tmpQuery.bindVariable("featureNode", item);
+            tmpQuery.setQuery("$featureNode/@id/string()");
 
-        if (!tmpQuery.isValid())
-        {
-            cout << "tmpquery not valid" << endl;
-            exit(1);
+            if (!tmpQuery.isValid())
+            {
+                cout << "tmpquery not valid" << endl;
+                exit(1);
+            }
+
+            QStringList tmpResults;
+            if(tmpQuery.evaluateTo(&tmpResults))
+                qDebug() << tmpResults.first();
+            else
+                qDebug() << "Could not evaluate the query";
+
+            item = results.next();
         }
-
-        QXmlResultItems tmpResults;
-        tmpQuery.evaluateTo(&tmpResults);
-        const QXmlItem tmpItem = tmpResults.next();
-
-        if (tmpItem.isNull())
-        {
-            cout << "tmpquery is null" << endl;
-            exit(1);
-        }
-        else if( tmpItem.isNode())
-        {
-            cout << "tmpitem is node" << endl;
-        }
-        else if( tmpItem.isAtomicValue())
-        {
-            cout << "tmpitem is atomic" << endl;
-        }
-
-        QVariant atomic = tmpItem.toAtomicValue();
-        cout << atomic.typeName() << endl; // outputs QString
-        cout << tmpItem.toAtomicValue().toString() << endl; // is empty
     }
     else
         cout << "Could not read the XML document" << endl;
