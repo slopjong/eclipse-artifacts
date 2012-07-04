@@ -22,6 +22,7 @@ SOURCES += main.cpp
 RESOURCES += \
     resources/artifacts.xml \
     resources/feature.xml \
-    resources/com.onpositive.gae.appwrench_1.5.0.jar
+    resources/com.onpositive.gae.appwrench_1.5.0.jar \
+    QuaZIP/quazip/*
 
 include(QuaZIP/quazip/quazip.pri)
