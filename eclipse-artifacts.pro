@@ -19,9 +19,9 @@ LIBS += -lz
 
 SOURCES += main.cpp
 
-RESOURCES += resources/artifacts.xml
-
-OTHER_FILES += \
-    resources/feature.xml
+RESOURCES += \
+    resources/artifacts.xml \
+    resources/feature.xml \
+    resources/com.onpositive.gae.appwrench_1.5.0.jar
 
 include(QuaZIP/quazip/quazip.pri)
