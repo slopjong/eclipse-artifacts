@@ -23,6 +23,7 @@ RESOURCES += \
     resources/artifacts.xml \
     resources/feature.xml \
     resources/com.onpositive.gae.appwrench_1.5.0.jar \
-    QuaZIP/quazip/*
+    QuaZIP/quazip/* \
+    QuaZIP/test/*
 
 include(QuaZIP/quazip/quazip.pri)
