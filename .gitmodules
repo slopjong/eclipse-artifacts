@@ -1,0 +1,3 @@
+[submodule "QuaZIP"]
+	path = QuaZIP
+	url = git@github.com:slopjong/QuaZIP.git
