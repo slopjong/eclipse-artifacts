@@ -3,6 +3,8 @@ Eclipse Artifacts
 
 eclipse-artifacts is going to be an Arch Linux tool to generate a PKGBUILD for eclipse plugins. Currently it's under heavy development yet.
 
+In other words, it's still a piece of junk which doesn't do anything useful right now.
+
 How it will work
 ----------------
 
