@@ -20,8 +20,14 @@ TEMPLATE = app
 
 LIBS += -lz
 
-SOURCES += src/main.cpp
+HEADERS += \
+    src/downloadmanager.h \
+    src/consoleapplication.h
 
+SOURCES += \
+    src/main.cpp \
+    src/downloadmanager.cpp \
+    src/consoleapplication.cpp
 
 OTHER_FILES += \
     resources/artifacts.xml \
