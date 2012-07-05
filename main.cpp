@@ -50,10 +50,13 @@ int main(int argc, char *argv[])
         aFile.close();
     }
 
-    QIODevice * sourceDocument = &aFile;
+    QByteArray xmlContent = aFile.readAll();
+    aFile.close();
+    QBuffer sourceDocument(&xmlContent);
+    sourceDocument.open(QIODevice::ReadOnly);
 
     QXmlQuery query(QXmlQuery::XPath20);
-    query.bindVariable("inputDocument", sourceDocument);
+    query.bindVariable("inputDocument", &sourceDocument);
     query.setQuery("doc($inputDocument)/feature/plugin");
 
     if (!query.isValid())
@@ -102,7 +105,7 @@ int main(int argc, char *argv[])
         item = results.next();
     }
 
-    sourceDocument->close();
+    sourceDocument.close();
 
     exit(0);
     return a.exec();
