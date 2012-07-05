@@ -8,14 +8,13 @@
 DownloadManager::DownloadManager(QObject *parent) :
     QNetworkAccessManager(parent)
 {
+    connect(this, SIGNAL(finished(QNetworkReply *)), SLOT(slotFinished(QNetworkReply *)));
 }
 
 void DownloadManager::get(QString url)
 {
     QNetworkRequest request(url);
     QNetworkAccessManager::get(request);
-
-    connect(this, SIGNAL(finished(QNetworkReply *)), SLOT(slotFinished(QNetworkReply *)));
 }
 
 /**

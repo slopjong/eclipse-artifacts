@@ -21,17 +21,28 @@
 
 ConsoleApplication::ConsoleApplication(int argc, char *argv[]) :
     QCoreApplication(argc, argv),
-    m_downloader(this)
+    m_downloader(this),
+    m_updateSite(QString(""))
 {
-    connect(&m_downloader, SIGNAL(downloadFinished(QBuffer*)), SLOT(slotDownloadFinished(QBuffer*)));
 }
 
 void ConsoleApplication::process()
 {
-    QString url = "http://appwrench.onpositive.com/static/updatesite/site.xml";
-    url = "http://slopjong.de";
+    // coming from the console later
+    QString url = "http://appwrench.onpositive.com/static/updatesite/";
+
+    // TODO: check if the trailing slash is there or not
+    /* some code */
+
+    m_updateSite = url;
+
+    url.append("site.xml");
+
+    connect(&m_downloader, SIGNAL(downloadFinished(QBuffer*)), SLOT(slotUpdatesiteDownloadFinished(QBuffer*)));
     m_downloader.get(url);
 
+
+    /*
     QTextStream cout(stdout, QIODevice::WriteOnly);
 
     QuaZip zipFile("resources/com.onpositive.gae.appwrench_1.5.0.jar");
@@ -118,11 +129,73 @@ void ConsoleApplication::process()
     sourceDocument.close();
 
     exit(0);
+    */
 }
 
-void ConsoleApplication::slotDownloadFinished(QBuffer *data)
+void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml)
+{
+    siteXml->open(QIODevice::ReadOnly);
+
+    QXmlQuery query(QXmlQuery::XPath20);
+    query.bindVariable("inputDocument", siteXml);
+    query.setQuery("doc($inputDocument)/site/feature");
+
+    if (!query.isValid())
+    {
+        qDebug() << "Query invalid.";
+        return;
+    }
+
+    QXmlResultItems results;
+    query.evaluateTo(&results);
+
+    QXmlItem item(results.next());
+    while(!item.isNull())
+    {
+        QXmlQuery tmpQuery;
+
+        tmpQuery.bindVariable("featureNode", item);
+        tmpQuery.setQuery("$featureNode/@url/string()");
+
+        if (!tmpQuery.isValid())
+        {
+            qDebug() << "Sub-query invalid.";
+            return;
+        }
+
+        QStringList tmpResults;
+        if(!tmpQuery.evaluateTo(&tmpResults))
+        {
+            qDebug() << "Could not evaluate the sub-query.";
+            return;
+        }
+
+        qDebug() << tmpResults.first();
+
+        item = results.next();
+    }
+
+    siteXml->close();
+    delete siteXml;
+}
+
+void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data)
 {
     data->open(QIODevice::ReadOnly);
-    qDebug() << "Download finished" << QString(data->readAll());
+    QByteArray ba = data->readAll();
+    data->close();
     delete data;
+
+    qDebug() << QString("Download finished:\n=================\n%1").arg(ba.constData());
+}
+
+
+void ConsoleApplication::slotPluginDownloadFinished(QBuffer *data)
+{
+    data->open(QIODevice::ReadOnly);
+    QByteArray ba = data->readAll();
+    data->close();
+    delete data;
+
+    qDebug() << QString("Download finished:\n=================\n%1").arg(ba.constData());
 }

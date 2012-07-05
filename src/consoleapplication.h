@@ -18,6 +18,7 @@ public:
 private:
 
     DownloadManager m_downloader;
+    QString m_updateSite;
 
 signals:
     
@@ -25,7 +26,9 @@ public slots:
 
 private slots:
 
-    void slotDownloadFinished(QBuffer *data);
+    void slotUpdatesiteDownloadFinished(QBuffer *data);
+    void slotFeatureDownloadFinished(QBuffer *data);
+    void slotPluginDownloadFinished(QBuffer *data);
     
 };
 
