@@ -13,11 +13,15 @@ TARGET = eclipse-artifacts
 CONFIG   += console
 CONFIG   -= app_bundle
 
+OBJECTS_DIR = build/objects
+MOC_DIR = build/moc
+
 TEMPLATE = app
 
 LIBS += -lz
 
-SOURCES += main.cpp
+SOURCES += src/main.cpp
+
 
 OTHER_FILES += \
     resources/artifacts.xml \
@@ -25,5 +29,7 @@ OTHER_FILES += \
     resources/com.onpositive.gae.appwrench_1.5.0.jar \
     3rd-party/QuaZIP/quazip/* \
     3rd-party/QuaZIP/test/*
+
+QMAKE_CXXFLAGS += -Wno-unused-variable -Wno-unused-parameter
 
 include(3rd-party/QuaZIP/quazip/quazip.pri)
