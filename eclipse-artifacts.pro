@@ -26,4 +26,4 @@ OTHER_FILES += \
     3rd-party/QuaZIP/quazip/* \
     3rd-party/QuaZIP/test/*
 
-include(QuaZIP/quazip/quazip.pri)
+include(3rd-party/QuaZIP/quazip/quazip.pri)
