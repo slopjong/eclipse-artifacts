@@ -132,6 +132,11 @@ void ConsoleApplication::process()
 
 void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml)
 {
+    qDebug() << "update";
+
+    m_downloader.disconnect();
+    connect(&m_downloader, SIGNAL(downloadFinished(QBuffer*)), SLOT(slotFeatureDownloadFinished(QBuffer*)));
+
     siteXml->open(QIODevice::ReadOnly);
 
     //QXmlQuery query(QXmlQuery::XPath20);
@@ -184,10 +189,15 @@ void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml)
         item = results.next();
     }
 
+    foreach(QString feature, m_features)
+    {
+        qDebug() << "Getting file " << QString("%1%2").arg(m_updateSite).arg(feature);
+        //m_downloader.get(QString("%1%2").arg(m_updateSite).arg(feature));
+        m_downloader.get("http://appwrench.onpositive.com/static/updatesite/features/com.onpositive.gae.appwrench_1.5.0.jar");
+    }
+
     siteXml->close();
     delete siteXml;
-
-    exit(0);
 }
 
 void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data)
@@ -197,7 +207,8 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data)
     data->close();
     delete data;
 
-    qDebug() << QString("Download finished:\n=================\n%1").arg(ba.constData());
+    qDebug() << "Feature downloaded";
+    //qDebug() << QString("Download finished:\n=================\n%1").arg(ba.constData());
 }
 
 
