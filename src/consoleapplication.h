@@ -4,6 +4,7 @@
 #include <QCoreApplication>
 
 #include <QtCore/QBuffer>
+#include <QtCore/QStringList>
 
 #include "downloadmanager.h"
 
@@ -19,6 +20,7 @@ private:
 
     DownloadManager m_downloader;
     QString m_updateSite;
+    QStringList m_features;
 
 signals:
     

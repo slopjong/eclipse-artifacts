@@ -20,9 +20,7 @@
 #include "consoleapplication.h"
 
 ConsoleApplication::ConsoleApplication(int argc, char *argv[]) :
-    QCoreApplication(argc, argv),
-    m_downloader(this),
-    m_updateSite(QString(""))
+    QCoreApplication(argc, argv)
 {
 }
 
@@ -136,9 +134,10 @@ void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml)
 {
     siteXml->open(QIODevice::ReadOnly);
 
-    QXmlQuery query(QXmlQuery::XPath20);
+    //QXmlQuery query(QXmlQuery::XPath20);
+    QXmlQuery query;
     query.bindVariable("inputDocument", siteXml);
-    query.setQuery("doc($inputDocument)/site/feature");
+    query.setQuery("doc($inputDocument)//feature");
 
     if (!query.isValid())
     {
@@ -155,7 +154,11 @@ void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml)
         QXmlQuery tmpQuery;
 
         tmpQuery.bindVariable("featureNode", item);
-        tmpQuery.setQuery("$featureNode/@url/string()");
+
+        // for whatever reason the query doesn't work
+        // with attribute names other than id, version
+        // and name and thus * is used.
+        tmpQuery.setQuery("$featureNode/@*/string()");
 
         if (!tmpQuery.isValid())
         {
@@ -170,13 +173,21 @@ void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml)
             return;
         }
 
-        qDebug() << tmpResults.first();
+        // because we fetch all the attributes we must filter
+        // the one containing .jar, a nasty workaround though
+        foreach(QString el, tmpResults)
+        {
+            if(el.contains(".jar"))
+                m_features << el;
+        }
 
         item = results.next();
     }
 
     siteXml->close();
     delete siteXml;
+
+    exit(0);
 }
 
 void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data)
