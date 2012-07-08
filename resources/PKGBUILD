@@ -1,0 +1,39 @@
+pkgname=$PKGNAME
+pkgver=$PKGVER
+pkgrel=$PKGREL
+pkgdesc="$DESCRIPTION"
+arch=('$ARCH')
+url="$URL"
+license=('$LICENSE')
+_eclipseversion=$ECLIPSEVER
+depends=('eclipse>='"$_eclipseversion"'' $DEPENDS)
+makedepends=('unzip')
+
+_updatesite="$UPDATESITE"
+
+$SOURCES
+$NOEXTRACT
+$MD5SUMS
+
+build()
+{
+    return 0;
+}
+
+package()
+{    
+    _dest=${pkgdir}/usr/share/eclipse/dropins/${pkgname/eclipse-}/eclipse
+    mkdir -p ${_dest}/{features,plugins}
+
+    for ((i=0; i < ${#source[@]}; i++))
+    do
+        # remove the update site from the source
+        source[$i]=${source[$i]/${_updatesite}}
+        # get the folder where the source belongs to
+        folder=${source[$i]/\/${noextract[$i]}}
+        # remove the folder from the source
+        source[$i]=${source[$i]/${folder}\/}
+        # install the source
+        install -m644 ${source[$i]} ${_dest}/${folder}
+    done  
+}

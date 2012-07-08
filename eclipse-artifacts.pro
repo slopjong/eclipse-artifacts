@@ -35,9 +35,13 @@ OTHER_FILES += \
     resources/artifacts.xml \
     resources/feature.xml \
     resources/com.onpositive.gae.appwrench_1.5.0.jar \
+    resources/PKGBUILD
     3rd-party/QuaZIP/quazip/* \
     3rd-party/QuaZIP/test/*
 
 QMAKE_CXXFLAGS += -Wno-unused-variable -Wno-unused-parameter
 
 include(3rd-party/QuaZIP/quazip/quazip.pri)
+
+RESOURCES += \
+    resources.qrc
