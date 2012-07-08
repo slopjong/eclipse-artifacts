@@ -20,7 +20,10 @@ public:
     
 private:
 
-    DownloadManager m_downloader;
+    DownloadManager m_site_downloader;
+    DownloadManager m_feature_downloader;
+    DownloadManager m_plugin_downloader;
+
     QString m_updateSite;
     QStringList m_features;
     QStringList m_plugins;

@@ -24,6 +24,9 @@ ConsoleApplication::ConsoleApplication(int argc, char *argv[]) :
     m_amount_features(0),
     m_amount_plugins(0)
 {
+    connect(&m_site_downloader, SIGNAL(downloadFinished(QBuffer*)), SLOT(slotUpdatesiteDownloadFinished(QBuffer*)));
+    connect(&m_feature_downloader, SIGNAL(downloadFinished(QBuffer*)), SLOT(slotFeatureDownloadFinished(QBuffer*)));
+    connect(&m_plugin_downloader, SIGNAL(downloadFinished(QBuffer*)), SLOT(slotPluginDownloadFinished(QBuffer*)));
 }
 
 void ConsoleApplication::process()
@@ -36,20 +39,13 @@ void ConsoleApplication::process()
     /* some code */
 
     m_updateSite = url;
-
     url.append("site.xml");
-
-    connect(&m_downloader, SIGNAL(downloadFinished(QBuffer*)), SLOT(slotUpdatesiteDownloadFinished(QBuffer*)));
-    m_downloader.get(url);
+    m_site_downloader.get(url);
 }
 
 void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml)
 {
     qDebug() << "site.xml downloaded from the update site.";
-
-    // disconnect this slot because only one site.xml
-    // is downloaded for one eclipse plugin
-    m_downloader.disconnect(this);
 
     siteXml->open(QIODevice::ReadOnly);
 
@@ -105,13 +101,10 @@ void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml)
 
     m_amount_features.fetch_add(m_features.size());
 
-    // connect the 'feature downloaded' slot
-    connect(&m_downloader, SIGNAL(downloadFinished(QBuffer*)), this, SLOT(slotFeatureDownloadFinished(QBuffer*)));
-
     foreach(QString feature, m_features)
     {
         qDebug() << "Getting file " << QString("%1%2").arg(m_updateSite).arg(feature);
-        m_downloader.get(QString("%1%2").arg(m_updateSite).arg(feature));
+        m_feature_downloader.get(QString("%1%2").arg(m_updateSite).arg(feature));
     }
 
     siteXml->close();
@@ -181,19 +174,16 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data)
 
         m_plugins << pluginResource;
 
-        QString downloadUrl = m_updateSite;
-        downloadUrl.append(pluginResource);
-
         item = results.next();
     }
 
-    // connect the 'feature downloaded' slot
-    //connect(&m_downloader, SIGNAL(downloadFinished(QBuffer*)), this, SLOT(slotFeatureDownloadFinished(QBuffer*)));
-
     foreach(QString plugin, m_plugins)
     {
-        qDebug() << "Getting file " << QString("%1%2").arg(m_updateSite).arg(plugin);
-        //m_downloader.get(QString("%1%2").arg(m_updateSite).arg(feature));
+        QString downloadUrl = m_updateSite;
+        downloadUrl.append(plugin);
+
+        qDebug() << "Getting file " << downloadUrl;
+        m_plugin_downloader.get(downloadUrl);
     }
 
     featureDocument.close();
@@ -236,10 +226,13 @@ QByteArray * ConsoleApplication::getFileFromZip(QString file, QBuffer *zip)
 
 void ConsoleApplication::slotPluginDownloadFinished(QBuffer *data)
 {
+    qDebug() << QString("Plugin download finished.");
+
+    /*
     data->open(QIODevice::ReadOnly);
     QByteArray ba = data->readAll();
     data->close();
-    delete data;
+    */
 
-    qDebug() << QString("Download finished:\n=================\n%1").arg(ba.constData());
+    delete data;
 }
