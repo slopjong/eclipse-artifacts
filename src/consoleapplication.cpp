@@ -122,16 +122,81 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data)
 {
     qDebug() << "Feature downloaded";
 
-    m_amount_features.fetch_add(1);
-    qDebug() << m_amount_features;
-
     QByteArray *feature = getFileFromZip("feature.xml", data);
 
     if(data->isOpen())
         data->close();
     delete data;
 
-    delete feature;
+    QBuffer featureDocument(feature);
+    featureDocument.open(QIODevice::ReadOnly);
+
+    QXmlQuery query;
+    query.bindVariable("inputDocument", &featureDocument);
+    query.setQuery("doc($inputDocument)//plugin");
+
+    if (!query.isValid())
+    {
+        qDebug() << "Query invalid.";
+        return;
+    }
+
+    QXmlResultItems results;
+    query.evaluateTo(&results);
+
+    QXmlItem item(results.next());
+    while(!item.isNull())
+    {
+        QXmlQuery tmpQuery;
+
+        tmpQuery.bindVariable("pluginNode", item);
+        QStringList tmpResults;
+
+        QStringList attributeList;
+        attributeList << "id" << "version";
+        foreach(QString attribute, attributeList)
+        {
+
+            QString queryString = "$pluginNode/@" + attribute + "/string()";
+            tmpQuery.setQuery(queryString);
+
+            if (!tmpQuery.isValid())
+            {
+                qDebug() << "Sub-query invalid.";
+                return;
+            }
+
+
+            if(!tmpQuery.evaluateTo(&tmpResults))
+            {
+                qDebug() << "Could not evaluate the sub-query.";
+                return;
+            }
+        }
+
+        QString pluginResource;
+        pluginResource.prepend("plugins/");
+        pluginResource.append(tmpResults.join("_"));
+        pluginResource.append(".jar");
+
+        m_plugins << pluginResource;
+
+        QString downloadUrl = m_updateSite;
+        downloadUrl.append(pluginResource);
+
+        item = results.next();
+    }
+
+    // connect the 'feature downloaded' slot
+    //connect(&m_downloader, SIGNAL(downloadFinished(QBuffer*)), this, SLOT(slotFeatureDownloadFinished(QBuffer*)));
+
+    foreach(QString plugin, m_plugins)
+    {
+        qDebug() << "Getting file " << QString("%1%2").arg(m_updateSite).arg(plugin);
+        //m_downloader.get(QString("%1%2").arg(m_updateSite).arg(feature));
+    }
+
+    featureDocument.close();
 }
 
 QByteArray * ConsoleApplication::getFileFromZip(QString file, QBuffer *zip)

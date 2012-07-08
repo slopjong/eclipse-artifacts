@@ -23,6 +23,7 @@ private:
     DownloadManager m_downloader;
     QString m_updateSite;
     QStringList m_features;
+    QStringList m_plugins;
 
     std::atomic<int> m_amount_features;
     std::atomic<int> m_amount_plugins;
