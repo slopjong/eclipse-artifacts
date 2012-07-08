@@ -23,11 +23,14 @@ ConsoleApplication::ConsoleApplication(int argc, char *argv[]) :
     QCoreApplication(argc, argv),
     m_amount_features(0),
     m_amount_plugins(0),
+    m_amount_processed_features(0),
+    m_amount_processed_plugins(0),
     m_queryLanguage(QXmlQuery::XQuery10)
 {
     connect(&m_site_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotUpdatesiteDownloadFinished(QBuffer*, QString)));
     connect(&m_feature_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotFeatureDownloadFinished(QBuffer*, QString)));
     connect(&m_plugin_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotPluginDownloadFinished(QBuffer*, QString)));
+    connect(this, SIGNAL(createPKGBUILD()), this, SLOT(slotDownloadsFinished()));
 }
 
 void ConsoleApplication::process()
@@ -43,6 +46,10 @@ void ConsoleApplication::process()
     url.append("site.xml");
     m_site_downloader.get(url);
 }
+
+/***************************
+ * SLOTS
+ ***************************/
 
 void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml, QString fileName)
 {
@@ -180,7 +187,7 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data, QString file
         item = results.next();
     }
 
-    m_amount_features.fetch_add(plugins.size());
+    m_amount_plugins.fetch_add(plugins.size());
     m_plugins << plugins;
 
     foreach(QString plugin, plugins)
@@ -192,6 +199,46 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data, QString file
     }
 
     featureDocument.close();
+
+    m_amount_processed_features.fetch_add(1);
+}
+
+
+void ConsoleApplication::slotPluginDownloadFinished(QBuffer *data, QString fileName)
+{
+    data->open(QIODevice::ReadOnly);
+    QByteArray bytes = data->readAll();
+    calculateHashes(fileName, bytes);
+
+    data->close();
+    delete data;
+
+    m_amount_processed_plugins.fetch_add(1);
+
+    qDebug() << QString("Plugin downloaded: %1/%2 => %3")
+                .arg(m_amount_processed_plugins)
+                .arg(m_amount_plugins)
+                .arg(fileName);
+
+    if(downloadsFinished())
+        emit createPKGBUILD();
+}
+
+void ConsoleApplication::slotDownloadsFinished()
+{
+    qDebug() << "Creating the PKGBUILD ...";
+}
+
+/***************************
+ * HELPERS
+ ***************************/
+
+void ConsoleApplication::calculateHashes(QString file, QByteArray &data)
+{
+    QString md5 = QString(QCryptographicHash::hash(data, QCryptographicHash::Md5).toHex());
+    QString sha = QString(QCryptographicHash::hash(data, QCryptographicHash::Sha1).toHex());
+    md5_hashes.insert(file, md5);
+    sha1_hashes.insert(file, sha);
 }
 
 QByteArray * ConsoleApplication::getFileFromZip(QString file, QBuffer *zip)
@@ -228,22 +275,9 @@ QByteArray * ConsoleApplication::getFileFromZip(QString file, QBuffer *zip)
     return xmlContent;
 }
 
-void ConsoleApplication::slotPluginDownloadFinished(QBuffer *data, QString fileName)
+bool ConsoleApplication::downloadsFinished()
 {
-    qDebug() << QString("Plugin downloaded: %1").arg(fileName);
-
-    data->open(QIODevice::ReadOnly);
-    QByteArray bytes = data->readAll();
-    calculateHashes(fileName, bytes);
-
-    data->close();
-    delete data;
-}
-
-void ConsoleApplication::calculateHashes(QString file, QByteArray &data)
-{
-    QString md5 = QString(QCryptographicHash::hash(data, QCryptographicHash::Md5).toHex());
-    QString sha = QString(QCryptographicHash::hash(data, QCryptographicHash::Sha1).toHex());
-    md5_hashes.insert(file, md5);
-    sha1_hashes.insert(file, sha);
+   bool pluginsReady = m_amount_plugins == m_amount_processed_plugins;
+   bool featuresReady = m_amount_features == m_amount_processed_features;
+   return pluginsReady && featuresReady;
 }

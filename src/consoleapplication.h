@@ -39,10 +39,16 @@ private:
     std::atomic<int> m_amount_features;
     std::atomic<int> m_amount_plugins;
 
+    std::atomic<int> m_amount_processed_features;
+    std::atomic<int> m_amount_processed_plugins;
+
     QByteArray * getFileFromZip(QString file, QBuffer *zip);
     void calculateHashes(QString file, QByteArray & data);
+    bool downloadsFinished();
 
 signals:
+
+    void createPKGBUILD();
     
 public slots:
 
@@ -51,6 +57,7 @@ private slots:
     void slotUpdatesiteDownloadFinished(QBuffer *data, QString fileName);
     void slotFeatureDownloadFinished(QBuffer *data, QString fileName);
     void slotPluginDownloadFinished(QBuffer *data, QString fileName);
+    void slotDownloadsFinished();
     
 };
 
