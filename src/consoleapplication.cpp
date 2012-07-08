@@ -9,7 +9,6 @@
 
 #include <QtXmlPatterns/QXmlNodeModelIndex>
 #include <QtXmlPatterns/QSimpleXmlNodeModel>
-#include <QtXmlPatterns/QXmlQuery>
 #include <QtXmlPatterns/QXmlResultItems>
 
 #include <cstdlib>
@@ -23,7 +22,8 @@
 ConsoleApplication::ConsoleApplication(int argc, char *argv[]) :
     QCoreApplication(argc, argv),
     m_amount_features(0),
-    m_amount_plugins(0)
+    m_amount_plugins(0),
+    m_queryLanguage(QXmlQuery::XPath20)
 {
     connect(&m_site_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotUpdatesiteDownloadFinished(QBuffer*, QString)));
     connect(&m_feature_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotFeatureDownloadFinished(QBuffer*, QString)));
@@ -50,8 +50,7 @@ void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml, QStrin
 
     siteXml->open(QIODevice::ReadOnly);
 
-    //QXmlQuery query(QXmlQuery::XPath20);
-    QXmlQuery query;
+    QXmlQuery query(m_queryLanguage);
     query.bindVariable("inputDocument", siteXml);
     query.setQuery("doc($inputDocument)//feature");
 
@@ -67,7 +66,7 @@ void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml, QStrin
     QXmlItem item(results.next());
     while(!item.isNull())
     {
-        QXmlQuery tmpQuery;
+        QXmlQuery tmpQuery(m_queryLanguage);
 
         tmpQuery.bindVariable("featureNode", item);
 
@@ -123,7 +122,7 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data, QString file
     QBuffer featureDocument(feature);
     featureDocument.open(QIODevice::ReadOnly);
 
-    QXmlQuery query;
+    QXmlQuery query(m_queryLanguage);
     query.bindVariable("inputDocument", &featureDocument);
     query.setQuery("doc($inputDocument)//plugin");
 
@@ -136,10 +135,11 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data, QString file
     QXmlResultItems results;
     query.evaluateTo(&results);
 
+
     QXmlItem item(results.next());
     while(!item.isNull())
     {
-        QXmlQuery tmpQuery;
+        QXmlQuery tmpQuery(m_queryLanguage);
 
         tmpQuery.bindVariable("pluginNode", item);
         QStringList tmpResults;

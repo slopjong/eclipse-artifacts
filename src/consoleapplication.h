@@ -7,6 +7,8 @@
 #include <QtCore/QStringList>
 #include <QtCore/QHash>
 
+#include <QtXmlPatterns/QXmlQuery>
+
 #include <atomic>
 
 #include "downloadmanager.h"
@@ -24,6 +26,8 @@ private:
     DownloadManager m_site_downloader;
     DownloadManager m_feature_downloader;
     DownloadManager m_plugin_downloader;
+
+    QXmlQuery::QueryLanguage m_queryLanguage;
 
     QString m_updateSite;
     QStringList m_features;
