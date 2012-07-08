@@ -38,104 +38,15 @@ void ConsoleApplication::process()
 
     connect(&m_downloader, SIGNAL(downloadFinished(QBuffer*)), SLOT(slotUpdatesiteDownloadFinished(QBuffer*)));
     m_downloader.get(url);
-
-
-    /*
-    QTextStream cout(stdout, QIODevice::WriteOnly);
-
-    QuaZip zipFile("resources/com.onpositive.gae.appwrench_1.5.0.jar");
-    zipFile.open(QuaZip::mdUnzip);
-    QuaZipFileInfo info;
-    QuaZipFile aFile(&zipFile);
-
-    bool more = zipFile.goToFirstFile();
-
-    if(!more)
-    {
-        cout << "The jar file doesn't contain any files." << endl;
-        exit(1);
-    }
-
-    while(more)
-    {
-        zipFile.getCurrentFileInfo(&info);
-        aFile.open(QIODevice::ReadOnly);
-        QString name = aFile.getActualFileName();
-
-        if(name == "feature.xml")
-            break;
-
-        more = zipFile.goToNextFile();
-        aFile.close();
-    }
-
-    QByteArray xmlContent = aFile.readAll();
-    aFile.close();
-    QBuffer sourceDocument(&xmlContent);
-    sourceDocument.open(QIODevice::ReadOnly);
-
-    QXmlQuery query(QXmlQuery::XPath20);
-    query.bindVariable("inputDocument", &sourceDocument);
-    query.setQuery("doc($inputDocument)/feature/plugin");
-
-    if (!query.isValid())
-    {
-        cout << "query valid" << endl;
-        exit(1);
-    }
-
-    QXmlResultItems results;
-    query.evaluateTo(&results);
-
-    QXmlItem item(results.next());
-    while(!item.isNull())
-    {
-        if (item.isNull())
-        {
-            cout << "query is null" << endl;
-            exit(1);
-        }
-        else if( item.isNode())
-        {
-            cout << "item is node" << endl;
-        }
-        else if( item.isAtomicValue())
-        {
-            cout << "item is atomic" << endl;
-        }
-
-        QXmlQuery tmpQuery;
-
-        tmpQuery.bindVariable("featureNode", item);
-        tmpQuery.setQuery("$featureNode/@id/string()");
-
-        if (!tmpQuery.isValid())
-        {
-            cout << "tmpquery not valid" << endl;
-            exit(1);
-        }
-
-        QStringList tmpResults;
-        if(tmpQuery.evaluateTo(&tmpResults))
-            cout << tmpResults.first() << endl;
-        else
-            cout << "Could not evaluate the query";
-
-        item = results.next();
-    }
-
-    sourceDocument.close();
-
-    exit(0);
-    */
 }
 
 void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml)
 {
-    qDebug() << "update";
+    qDebug() << "site.xml downloaded from the update site.";
 
-    m_downloader.disconnect();
-    connect(&m_downloader, SIGNAL(downloadFinished(QBuffer*)), SLOT(slotFeatureDownloadFinished(QBuffer*)));
+    // disconnect this slot because only one site.xml
+    // is downloaded for one eclipse plugin
+    m_downloader.disconnect(this);
 
     siteXml->open(QIODevice::ReadOnly);
 
@@ -189,11 +100,14 @@ void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml)
         item = results.next();
     }
 
+
+    // connect the 'feature downloaded' slot
+    connect(&m_downloader, SIGNAL(downloadFinished(QBuffer*)), this, SLOT(slotFeatureDownloadFinished(QBuffer*)));
+
     foreach(QString feature, m_features)
     {
         qDebug() << "Getting file " << QString("%1%2").arg(m_updateSite).arg(feature);
-        //m_downloader.get(QString("%1%2").arg(m_updateSite).arg(feature));
-        m_downloader.get("http://appwrench.onpositive.com/static/updatesite/features/com.onpositive.gae.appwrench_1.5.0.jar");
+        m_downloader.get(QString("%1%2").arg(m_updateSite).arg(feature));
     }
 
     siteXml->close();
@@ -202,13 +116,51 @@ void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml)
 
 void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data)
 {
-    data->open(QIODevice::ReadOnly);
-    QByteArray ba = data->readAll();
-    data->close();
+    qDebug() << "Feature downloaded";
+
+    QByteArray *feature = getFileFromZip("feature.xml", data);
+
+    qDebug() << *feature;
+
+    if(data->isOpen())
+        data->close();
     delete data;
 
-    qDebug() << "Feature downloaded";
-    //qDebug() << QString("Download finished:\n=================\n%1").arg(ba.constData());
+    delete feature;
+}
+
+QByteArray * ConsoleApplication::getFileFromZip(QString file, QBuffer *zip)
+{
+    QuaZip zipFile(zip);
+    zipFile.open(QuaZip::mdUnzip);
+    QuaZipFileInfo info;
+    QuaZipFile aFile(&zipFile);
+
+    bool more = zipFile.goToFirstFile();
+
+    if(!more)
+    {
+        qDebug() << "The jar file doesn't contain any files.";
+        exit(1);
+    }
+
+    while(more)
+    {
+        zipFile.getCurrentFileInfo(&info);
+        aFile.open(QIODevice::ReadOnly);
+        QString name = aFile.getActualFileName();
+
+        if(name == file)
+            break;
+
+        more = zipFile.goToNextFile();
+        aFile.close();
+    }
+
+    QByteArray * xmlContent = new QByteArray();
+    xmlContent->append(aFile.readAll());
+    aFile.close();
+    return xmlContent;
 }
 
 

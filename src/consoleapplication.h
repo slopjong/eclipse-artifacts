@@ -22,6 +22,8 @@ private:
     QString m_updateSite;
     QStringList m_features;
 
+    QByteArray * getFileFromZip(QString file, QBuffer *zip);
+
 signals:
     
 public slots:
