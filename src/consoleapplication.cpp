@@ -2,6 +2,7 @@
 
 #include <QtCore/QByteArray>
 #include <QtCore/QBuffer>
+#include <QtCore/QCryptographicHash>
 #include <QtCore/QFile>
 #include <QtCore/QStringList>
 #include <QtCore/QTextStream>
@@ -24,9 +25,9 @@ ConsoleApplication::ConsoleApplication(int argc, char *argv[]) :
     m_amount_features(0),
     m_amount_plugins(0)
 {
-    connect(&m_site_downloader, SIGNAL(downloadFinished(QBuffer*)), SLOT(slotUpdatesiteDownloadFinished(QBuffer*)));
-    connect(&m_feature_downloader, SIGNAL(downloadFinished(QBuffer*)), SLOT(slotFeatureDownloadFinished(QBuffer*)));
-    connect(&m_plugin_downloader, SIGNAL(downloadFinished(QBuffer*)), SLOT(slotPluginDownloadFinished(QBuffer*)));
+    connect(&m_site_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotUpdatesiteDownloadFinished(QBuffer*, QString)));
+    connect(&m_feature_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotFeatureDownloadFinished(QBuffer*, QString)));
+    connect(&m_plugin_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotPluginDownloadFinished(QBuffer*, QString)));
 }
 
 void ConsoleApplication::process()
@@ -43,9 +44,9 @@ void ConsoleApplication::process()
     m_site_downloader.get(url);
 }
 
-void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml)
+void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml, QString fileName)
 {
-    qDebug() << "site.xml downloaded from the update site.";
+    qDebug() << "Downloaded site.xml from the update site.";
 
     siteXml->open(QIODevice::ReadOnly);
 
@@ -102,20 +103,18 @@ void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml)
     m_amount_features.fetch_add(m_features.size());
 
     foreach(QString feature, m_features)
-    {
-        qDebug() << "Getting file " << QString("%1%2").arg(m_updateSite).arg(feature);
         m_feature_downloader.get(QString("%1%2").arg(m_updateSite).arg(feature));
-    }
 
     siteXml->close();
     delete siteXml;
 }
 
-void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data)
+void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data, QString fileName)
 {
-    qDebug() << "Feature downloaded";
+    qDebug() << QString("Feature downloaded: %1").arg(fileName);
 
     QByteArray *feature = getFileFromZip("feature.xml", data);
+    calculateHashes(fileName, *feature);
 
     if(data->isOpen())
         data->close();
@@ -182,7 +181,6 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data)
         QString downloadUrl = m_updateSite;
         downloadUrl.append(plugin);
 
-        qDebug() << "Getting file " << downloadUrl;
         m_plugin_downloader.get(downloadUrl);
     }
 
@@ -223,16 +221,22 @@ QByteArray * ConsoleApplication::getFileFromZip(QString file, QBuffer *zip)
     return xmlContent;
 }
 
-
-void ConsoleApplication::slotPluginDownloadFinished(QBuffer *data)
+void ConsoleApplication::slotPluginDownloadFinished(QBuffer *data, QString fileName)
 {
-    qDebug() << QString("Plugin download finished.");
+    qDebug() << QString("Plugin downloaded: %1").arg(fileName);
 
-    /*
     data->open(QIODevice::ReadOnly);
-    QByteArray ba = data->readAll();
-    data->close();
-    */
+    QByteArray bytes = data->readAll();
+    calculateHashes(fileName, bytes);
 
+    data->close();
     delete data;
+}
+
+void ConsoleApplication::calculateHashes(QString file, QByteArray &data)
+{
+    QString md5 = QString(QCryptographicHash::hash(data, QCryptographicHash::Md5).toHex());
+    QString sha = QString(QCryptographicHash::hash(data, QCryptographicHash::Sha1).toHex());
+    md5_hashes.insert(file, md5);
+    sha1_hashes.insert(file, sha);
 }

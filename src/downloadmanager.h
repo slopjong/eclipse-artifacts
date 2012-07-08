@@ -20,7 +20,7 @@ public:
 
 signals:
     
-    void downloadFinished(QBuffer * buffer);
+    void downloadFinished(QBuffer * buffer, QString fileName);
 
 public slots:
 

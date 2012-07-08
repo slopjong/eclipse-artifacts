@@ -2,6 +2,7 @@
 #include <QDebug>
 
 #include <QtCore/QByteArray>
+#include <QtCore/QFileInfo>
 
 #include "downloadmanager.h"
 
@@ -29,7 +30,11 @@ void DownloadManager::slotFinished(QNetworkReply *reply)
     QByteArray ba = reply->readAll();
     QBuffer * buffer = new QBuffer(&ba);
 
+    // get the file name
+    QUrl url = reply->url();
+    QString fileName = QFileInfo(url.path()).fileName();
+
     reply->deleteLater();
 
-    emit downloadFinished(buffer);
+    emit downloadFinished(buffer, fileName);
 }

@@ -5,6 +5,7 @@
 
 #include <QtCore/QBuffer>
 #include <QtCore/QStringList>
+#include <QtCore/QHash>
 
 #include <atomic>
 
@@ -28,10 +29,14 @@ private:
     QStringList m_features;
     QStringList m_plugins;
 
+    QHash<QString, QString> md5_hashes;
+    QHash<QString, QString> sha1_hashes;
+
     std::atomic<int> m_amount_features;
     std::atomic<int> m_amount_plugins;
 
     QByteArray * getFileFromZip(QString file, QBuffer *zip);
+    void calculateHashes(QString file, QByteArray & data);
 
 signals:
     
@@ -39,9 +44,9 @@ public slots:
 
 private slots:
 
-    void slotUpdatesiteDownloadFinished(QBuffer *data);
-    void slotFeatureDownloadFinished(QBuffer *data);
-    void slotPluginDownloadFinished(QBuffer *data);
+    void slotUpdatesiteDownloadFinished(QBuffer *data, QString fileName);
+    void slotFeatureDownloadFinished(QBuffer *data, QString fileName);
+    void slotPluginDownloadFinished(QBuffer *data, QString fileName);
     
 };
 
