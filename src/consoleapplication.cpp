@@ -20,7 +20,9 @@
 #include "consoleapplication.h"
 
 ConsoleApplication::ConsoleApplication(int argc, char *argv[]) :
-    QCoreApplication(argc, argv)
+    QCoreApplication(argc, argv),
+    m_amount_features(0),
+    m_amount_plugins(0)
 {
 }
 
@@ -28,6 +30,7 @@ void ConsoleApplication::process()
 {
     // coming from the console later
     QString url = "http://appwrench.onpositive.com/static/updatesite/";
+    //QString url = "http://download.eclipse.org/tools/cdt/releases/helios/";
 
     // TODO: check if the trailing slash is there or not
     /* some code */
@@ -100,6 +103,7 @@ void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml)
         item = results.next();
     }
 
+    m_amount_features.fetch_add(m_features.size());
 
     // connect the 'feature downloaded' slot
     connect(&m_downloader, SIGNAL(downloadFinished(QBuffer*)), this, SLOT(slotFeatureDownloadFinished(QBuffer*)));
@@ -118,9 +122,10 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data)
 {
     qDebug() << "Feature downloaded";
 
-    QByteArray *feature = getFileFromZip("feature.xml", data);
+    m_amount_features.fetch_add(1);
+    qDebug() << m_amount_features;
 
-    qDebug() << *feature;
+    QByteArray *feature = getFileFromZip("feature.xml", data);
 
     if(data->isOpen())
         data->close();

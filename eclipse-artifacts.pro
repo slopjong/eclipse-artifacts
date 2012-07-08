@@ -13,6 +13,8 @@ TARGET = eclipse-artifacts
 CONFIG   += console
 CONFIG   -= app_bundle
 
+QMAKE_CXXFLAGS += -std=gnu++11
+
 OBJECTS_DIR = build/objects
 MOC_DIR = build/moc
 

@@ -6,6 +6,8 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QStringList>
 
+#include <atomic>
+
 #include "downloadmanager.h"
 
 class ConsoleApplication : public QCoreApplication
@@ -21,6 +23,9 @@ private:
     DownloadManager m_downloader;
     QString m_updateSite;
     QStringList m_features;
+
+    std::atomic<int> m_amount_features;
+    std::atomic<int> m_amount_plugins;
 
     QByteArray * getFileFromZip(QString file, QBuffer *zip);
 
