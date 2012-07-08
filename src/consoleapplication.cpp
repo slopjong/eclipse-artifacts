@@ -23,7 +23,7 @@ ConsoleApplication::ConsoleApplication(int argc, char *argv[]) :
     QCoreApplication(argc, argv),
     m_amount_features(0),
     m_amount_plugins(0),
-    m_queryLanguage(QXmlQuery::XPath20)
+    m_queryLanguage(QXmlQuery::XQuery10)
 {
     connect(&m_site_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotUpdatesiteDownloadFinished(QBuffer*, QString)));
     connect(&m_feature_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotFeatureDownloadFinished(QBuffer*, QString)));
@@ -63,6 +63,8 @@ void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml, QStrin
     QXmlResultItems results;
     query.evaluateTo(&results);
 
+    QStringList features;
+
     QXmlItem item(results.next());
     while(!item.isNull())
     {
@@ -93,15 +95,16 @@ void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml, QStrin
         foreach(QString el, tmpResults)
         {
             if(el.contains(".jar"))
-                m_features << el;
+                features << el;
         }
 
         item = results.next();
     }
 
-    m_amount_features.fetch_add(m_features.size());
+    m_amount_features.fetch_add(features.size());
+    m_features << features;
 
-    foreach(QString feature, m_features)
+    foreach(QString feature, features)
         m_feature_downloader.get(QString("%1%2").arg(m_updateSite).arg(feature));
 
     siteXml->close();
@@ -135,6 +138,7 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data, QString file
     QXmlResultItems results;
     query.evaluateTo(&results);
 
+    QStringList plugins;
 
     QXmlItem item(results.next());
     while(!item.isNull())
@@ -171,12 +175,15 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data, QString file
         pluginResource.append(tmpResults.join("_"));
         pluginResource.append(".jar");
 
-        m_plugins << pluginResource;
+        plugins << pluginResource;
 
         item = results.next();
     }
 
-    foreach(QString plugin, m_plugins)
+    m_amount_features.fetch_add(plugins.size());
+    m_plugins << plugins;
+
+    foreach(QString plugin, plugins)
     {
         QString downloadUrl = m_updateSite;
         downloadUrl.append(plugin);
