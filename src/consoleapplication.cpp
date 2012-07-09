@@ -49,6 +49,11 @@ ConsoleApplication::ConsoleApplication(int argc, char *argv[]) :
 
     // add the update site to the PKGBUILD variables
     m_pkgbuild_variables.insert("UPDATESITE", m_updateSite);
+
+    // fill some default values
+    m_pkgbuild_variables.insert("PKGREL", "1");
+    m_pkgbuild_variables.insert("LICENSE", "custom");
+    m_pkgbuild_variables.insert("ECLIPSEVER", "3.5");
 }
 
 void ConsoleApplication::process()
@@ -64,11 +69,26 @@ void ConsoleApplication::process()
 
     foreach(QString variable, variables)
     {
-        cout << variable.toLower().toLocal8Bit().constData() << ": ";
+        QString value = m_pkgbuild_variables.value(variable);
+
+        QString defaultMsg = "";
+
+        if(value != "")
+            defaultMsg = QString(" (default=%1) ").arg(value);
+
+        if(variable == "PKGNAME")
+            defaultMsg = QString(" (add the eclipse- prefix) ");
+
+        if(variable == "DEPENDS")
+            defaultMsg = QString(" (list plugins only, space-seperated) ");
+
+        cout << variable.toLower().toLocal8Bit().constData() << defaultMsg << ": ";
         cout.flush();
-        QString value;
+
         value = cin.readLine();
-        m_pkgbuild_variables.insert(variable, value);
+
+        if(value != "")
+            m_pkgbuild_variables.insert(variable, value);
     }
 
     QString url = m_updateSite;
