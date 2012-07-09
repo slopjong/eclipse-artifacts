@@ -1,7 +1,7 @@
 Eclipse Artifacts
 =================
 
-`eclipse-artifacts` is a tool for Arch Linux which is a PKGBUILD generator for  eclipse plugins. You tell it the URL of the update site (the location where to download the plugin artifacts) and the tools does the rest for you and creates a ready-to-use PKGBUILD.
+`eclipse-artifacts` is a tool for Arch Linux which is a PKGBUILD generator for  eclipse plugins. You tell it the URL of the update site (the location where to download the plugin artifacts from) and the tool does the rest for you and creates a ready-to-use PKGBUILD.
 
 
 When to use this tool?
@@ -14,19 +14,10 @@ If no zip file is provided but only atomic artifacts you could manually fetch al
 This doesn't make fun, especially for huge plugins. In this case you'd better use this tool.
 
 
-What features are coming in the future?
----------------------------------------
-
-Currently you have to execute `makepkg -s` or `makepkg -S` yourself. Letting `eclipse-artifacts` do it is no big deal but it's not yet done. With a future version you should be able to create the source package to upload it to the [Arch User Repository](http://aur.archlinux.org/) with this tool.
-
-Some people prefer a graphical user interface. This will come too.
-
-A dependency resolver would be nice to have too. In the current version you must type other required plugins.
-
 How to get it?
 --------------
 
-Get it by using `git clone git://github.com/slopjong/eclipse-artifacts.git` or by the [direct download (v0.1)](https://github.com/slopjong/eclipse-artifacts/zipball/v0.1).
+Get it by cloning it with `git clone git://github.com/slopjong/eclipse-artifacts.git` or by the [direct download (v0.1)](https://github.com/slopjong/eclipse-artifacts/zipball/v0.1).
 
 After cloning/extracting it go into the `eclipse-artifacts` directory (for the direct download it looks like `slopjong-eclipse-artifacts-5bdc503`). Then run `qmake` and `make`.
 
@@ -53,7 +44,18 @@ depends (list plugins only, space-seperated) : eclipse-gpe
 
 On startup it will ask you for some package details.
 
+
+What features are coming in the future?
+---------------------------------------
+
+Currently you have to execute `makepkg -s` or `makepkg -S` yourself after the PKGBUILD generation. Letting `eclipse-artifacts` do it is no big deal but it's not yet done. With a future version you should be able to create the source package and to upload it to the [Arch User Repository](http://aur.archlinux.org/) directly from this tool.
+
+Some people prefer a graphical user interface. This will come too.
+
+A dependency resolver would be nice to have too. In the current version you must type other required plugins.
+
+
 Why does this tool not work with the update site I'm providing?
 ---------------------------------------------------------------
 
-Until now only update sites are supported which provide a site.xml file. Update sites using the Equinox p2 mechanism don't work with this tool.
+Until now only update sites are supported which provide a site.xml file. Update sites using the Equinox p2 mechanism don't work with this tool until now.
