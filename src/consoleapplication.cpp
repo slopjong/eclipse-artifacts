@@ -29,9 +29,12 @@ ConsoleApplication::ConsoleApplication(int argc, char *argv[]) :
     m_amount_processed_plugins(0),
     m_queryLanguage(QXmlQuery::XQuery10)
 {
-    connect(&m_site_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotUpdatesiteDownloadFinished(QBuffer*, QString)));
-    connect(&m_feature_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotFeatureDownloadFinished(QBuffer*, QString)));
-    connect(&m_plugin_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotPluginDownloadFinished(QBuffer*, QString)));
+    connect(&m_site_downloader, SIGNAL(downloadFinished(QBuffer*, QString)),
+            SLOT(slotUpdatesiteDownloadFinished(QBuffer*, QString)));
+    connect(&m_feature_downloader, SIGNAL(downloadFinished(QBuffer*, QString)),
+            SLOT(slotFeatureDownloadFinished(QBuffer*, QString)));
+    connect(&m_plugin_downloader, SIGNAL(downloadFinished(QBuffer*, QString)),
+            SLOT(slotPluginDownloadFinished(QBuffer*, QString)));
     connect(this, SIGNAL(createPKGBUILD()), this, SLOT(slotDownloadsFinished()));
 
     if(argc>1)
@@ -61,10 +64,13 @@ void ConsoleApplication::process()
     QTextStream cin(stdin, QIODevice::ReadOnly);
     QTextStream cout(stdout, QIODevice::WriteOnly);
 
-    cout << endl;
-    cout << "Please provide some information about the eclipse plugin you're packaging." << endl;
-    cout << "The fields providing a default value can be left blank." << endl;
-    cout << endl;
+    cout
+    << endl
+    << "Please provide some information about the eclipse plugin you're packaging."
+    << endl
+    << "The fields providing a default value can be left blank."
+    << endl
+    << endl;
 
     QStringList variables;
     variables << "MAINTAINER" << "EMAIL" << "PKGNAME" << "PKGVER" << "PKGREL"

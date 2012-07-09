@@ -9,7 +9,8 @@
 DownloadManager::DownloadManager(QObject *parent) :
     QNetworkAccessManager(parent)
 {
-    connect(this, SIGNAL(finished(QNetworkReply *)), SLOT(slotFinished(QNetworkReply *)));
+    connect(this, SIGNAL(finished(QNetworkReply *)),
+            SLOT(slotFinished(QNetworkReply *)));
 }
 
 void DownloadManager::get(QString url)
@@ -19,8 +20,8 @@ void DownloadManager::get(QString url)
 }
 
 /**
- * This slot emits the downloadFinished signal and transmits a QBuffer which is a
- * QIODevice. The user has the responsibility to delete the buffer.
+ * This slot emits the downloadFinished signal and transmits a QBuffer which is
+ * a QIODevice. The user has the responsibility to delete the buffer.
  *
  * @brief DownloadManager::slotFinished
  * @param reply
