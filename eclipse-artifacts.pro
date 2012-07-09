@@ -37,7 +37,8 @@ OTHER_FILES += \
     resources/com.onpositive.gae.appwrench_1.5.0.jar \
     resources/PKGBUILD \
     3rd-party/QuaZIP/quazip/* \
-    3rd-party/QuaZIP/test/*
+    3rd-party/QuaZIP/test/* \
+    README.md
 
 QMAKE_CXXFLAGS += -Wno-unused-variable -Wno-unused-parameter
 
