@@ -50,13 +50,21 @@ ConsoleApplication::ConsoleApplication(int argc, char *argv[]) :
     if(m_updateSite[size-1] != '/')
         m_updateSite.append("/");
 
+    // prepend a http:// if missing
+    if(!m_updateSite.contains("http"))
+        m_updateSite.prepend("http://");
+
     // add the update site to the PKGBUILD variables
     m_pkgbuild_variables.insert("UPDATESITE", m_updateSite);
 
+
     // fill some default values
-    m_pkgbuild_variables.insert("PKGREL", "1");
-    m_pkgbuild_variables.insert("LICENSE", "custom");
+    foreach(QString variable, variableTemplates())
+        m_pkgbuild_variables.insert(variable, "");
+
     m_pkgbuild_variables.insert("ECLIPSEVER", "3.5");
+    m_pkgbuild_variables.insert("LICENSE", "custom");
+    m_pkgbuild_variables.insert("PKGREL", "1");
 }
 
 void ConsoleApplication::process()
@@ -72,11 +80,7 @@ void ConsoleApplication::process()
     << endl
     << endl;
 
-    QStringList variables;
-    variables << "MAINTAINER" << "EMAIL" << "PKGNAME" << "PKGVER" << "PKGREL"
-              << "DESCRIPTION" << "URL" << "LICENSE" << "ECLIPSEVER" << "DEPENDS";
-
-    foreach(QString variable, variables)
+    foreach(QString variable, variableTemplates())
     {
         QString value = m_pkgbuild_variables.value(variable);
 
@@ -416,4 +420,13 @@ bool ConsoleApplication::downloadsFinished()
    bool pluginsReady = m_amount_plugins == m_amount_processed_plugins;
    bool featuresReady = m_amount_features == m_amount_processed_features;
    return pluginsReady && featuresReady;
+}
+
+QStringList ConsoleApplication::variableTemplates()
+{
+    QStringList variables;
+    variables << "MAINTAINER" << "EMAIL" << "PKGNAME" << "PKGVER" << "PKGREL"
+              << "DESCRIPTION" << "URL" << "LICENSE" << "ECLIPSEVER" << "DEPENDS";
+
+    return variables;
 }

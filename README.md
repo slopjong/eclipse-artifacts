@@ -17,7 +17,7 @@ This doesn't make fun, especially for huge plugins. In this case you'd better us
 How to get it?
 --------------
 
-Get it by cloning it with `git clone git://github.com/slopjong/eclipse-artifacts.git` or by the [direct download (v0.1)](https://github.com/slopjong/eclipse-artifacts/zipball/v0.1).
+Get it by cloning it with `git clone git://github.com/slopjong/eclipse-artifacts.git` or by the [direct download (v0.1.1)](https://github.com/slopjong/eclipse-artifacts/zipball/v0.1.1).
 
 After cloning/extracting it go into the `eclipse-artifacts` directory (for the direct download it looks like `slopjong-eclipse-artifacts-5bdc503`). Then run `qmake` and `make`.
 

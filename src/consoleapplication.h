@@ -47,6 +47,7 @@ private:
     QByteArray getFileFromZip(QString file, QBuffer *zip);
     void calculateHashes(QString file, QByteArray & data);
     bool downloadsFinished();
+    QStringList variableTemplates();
 
 signals:
 
