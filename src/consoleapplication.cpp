@@ -61,7 +61,10 @@ void ConsoleApplication::process()
     QTextStream cin(stdin, QIODevice::ReadOnly);
     QTextStream cout(stdout, QIODevice::WriteOnly);
 
+    cout << endl;
     cout << "Please provide some information about the eclipse plugin you're packaging." << endl;
+    cout << "The fields providing a default value can be left blank." << endl;
+    cout << endl;
 
     QStringList variables;
     variables << "MAINTAINER" << "EMAIL" << "PKGNAME" << "PKGVER" << "PKGREL"
