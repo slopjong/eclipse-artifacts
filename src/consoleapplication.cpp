@@ -151,7 +151,14 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data, QString file
 {
     qDebug() << QString("Feature downloaded: %1").arg(fileName);
 
+    if(!data->open(QIODevice::ReadOnly))
+    {
+        qDebug() << "Could not open the feature file in read mode." << endl;
+        std::exit(1);
+    }
+
     QByteArray feature = data->readAll();
+
     calculateHashes(fileName, feature);
     feature = getFileFromZip("feature.xml", data);
 
@@ -264,6 +271,21 @@ void ConsoleApplication::slotDownloadsFinished()
     foreach(QString key, m_pkgbuild_variables.keys())
     {
         QString value = m_pkgbuild_variables.value(key);
+
+        // the dependencies need some extra attention
+        if(key == "DEPENDS")
+        {
+            QStringList deps = value.split(QRegExp("\s*"));
+            value = "";
+            foreach(QString dep, deps)
+            {
+                // strip whitespaces
+                dep = dep.replace(QRegExp("\s*"), "");
+                if(dep != "" && dep != " ")
+                    value += QString("'%1' ").arg(dep);
+            }
+        }
+
         pkgbuild.replace("$"+key, value.toUtf8());
     }
 
