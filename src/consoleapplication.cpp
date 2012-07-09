@@ -295,12 +295,12 @@ void ConsoleApplication::slotDownloadsFinished()
         // the dependencies need some extra attention
         if(key == "DEPENDS")
         {
-            QStringList deps = value.split(QRegExp("\s*"));
+            QStringList deps = value.split(QRegExp("\\s+"));
             value = "";
             foreach(QString dep, deps)
             {
                 // strip whitespaces
-                dep = dep.replace(QRegExp("\s*"), "");
+                dep = dep.replace(QRegExp("\\s+"), "");
                 if(dep != "" && dep != " ")
                     value += QString("'%1' ").arg(dep);
             }
