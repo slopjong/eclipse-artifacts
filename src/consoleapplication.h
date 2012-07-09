@@ -36,13 +36,15 @@ private:
     QHash<QString, QString> md5_hashes;
     QHash<QString, QString> sha1_hashes;
 
+    QHash<QString, QString> m_pkgbuild_variables;
+
     std::atomic<int> m_amount_features;
     std::atomic<int> m_amount_plugins;
 
     std::atomic<int> m_amount_processed_features;
     std::atomic<int> m_amount_processed_plugins;
 
-    QByteArray * getFileFromZip(QString file, QBuffer *zip);
+    QByteArray getFileFromZip(QString file, QBuffer *zip);
     void calculateHashes(QString file, QByteArray & data);
     bool downloadsFinished();
 

@@ -35,7 +35,7 @@ OTHER_FILES += \
     resources/artifacts.xml \
     resources/feature.xml \
     resources/com.onpositive.gae.appwrench_1.5.0.jar \
-    resources/PKGBUILD
+    resources/PKGBUILD \
     3rd-party/QuaZIP/quazip/* \
     3rd-party/QuaZIP/test/*
 

@@ -1,8 +1,16 @@
+# Maintainer: $MAINTAINER <$EMAIL>
+#
+# PKGBUILD generated with the eclipse-artifacts tool.
+#
+# Bugs to be filed here:
+#
+#    https://github.com/slopjong/eclipse-artifacts/issues/new
+
 pkgname=$PKGNAME
 pkgver=$PKGVER
 pkgrel=$PKGREL
 pkgdesc="$DESCRIPTION"
-arch=('$ARCH')
+arch=('any')
 url="$URL"
 license=('$LICENSE')
 _eclipseversion=$ECLIPSEVER

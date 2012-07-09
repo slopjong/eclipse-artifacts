@@ -13,6 +13,8 @@
 
 #include <cstdlib>
 #include <typeinfo>
+#include <iostream>
+#include <string>
 
 #include "quazip.h"
 #include "quazipfile.h"
@@ -31,18 +33,45 @@ ConsoleApplication::ConsoleApplication(int argc, char *argv[]) :
     connect(&m_feature_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotFeatureDownloadFinished(QBuffer*, QString)));
     connect(&m_plugin_downloader, SIGNAL(downloadFinished(QBuffer*, QString)), SLOT(slotPluginDownloadFinished(QBuffer*, QString)));
     connect(this, SIGNAL(createPKGBUILD()), this, SLOT(slotDownloadsFinished()));
+
+    if(argc>1)
+        m_updateSite = argv[1];
+    else
+    {
+        qDebug() << "Please provide an update site";
+        std::exit(1);
+    }
+
+    // append a trailing slash if it's missing
+    int size = m_updateSite.size();
+    if(m_updateSite[size-1] != '/')
+        m_updateSite.append("/");
+
+    // add the update site to the PKGBUILD variables
+    m_pkgbuild_variables.insert("UPDATESITE", m_updateSite);
 }
 
 void ConsoleApplication::process()
 {
-    // coming from the console later
-    QString url = "http://appwrench.onpositive.com/static/updatesite/";
-    //QString url = "http://download.eclipse.org/tools/cdt/releases/helios/";
+    QTextStream cin(stdin, QIODevice::ReadOnly);
+    QTextStream cout(stdout, QIODevice::WriteOnly);
 
-    // TODO: check if the trailing slash is there or not
-    /* some code */
+    cout << "Please provide some information about the eclipse plugin you're packaging." << endl;
 
-    m_updateSite = url;
+    QStringList variables;
+    variables << "MAINTAINER" << "EMAIL" << "PKGNAME" << "PKGVER" << "PKGREL"
+              << "DESCRIPTION" << "URL" << "LICENSE" << "ECLIPSEVER" << "DEPENDS";
+
+    foreach(QString variable, variables)
+    {
+        cout << variable.toLower().toLocal8Bit().constData() << ": ";
+        cout.flush();
+        QString value;
+        value = cin.readLine();
+        m_pkgbuild_variables.insert(variable, value);
+    }
+
+    QString url = m_updateSite;
     url.append("site.xml");
     m_site_downloader.get(url);
 }
@@ -122,14 +151,15 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data, QString file
 {
     qDebug() << QString("Feature downloaded: %1").arg(fileName);
 
-    QByteArray *feature = getFileFromZip("feature.xml", data);
-    calculateHashes(fileName, *feature);
+    QByteArray feature = data->readAll();
+    calculateHashes(fileName, feature);
+    feature = getFileFromZip("feature.xml", data);
 
     if(data->isOpen())
         data->close();
     delete data;
 
-    QBuffer featureDocument(feature);
+    QBuffer featureDocument(&feature);
     featureDocument.open(QIODevice::ReadOnly);
 
     QXmlQuery query(m_queryLanguage);
@@ -226,7 +256,62 @@ void ConsoleApplication::slotPluginDownloadFinished(QBuffer *data, QString fileN
 
 void ConsoleApplication::slotDownloadsFinished()
 {
-    qDebug() << "Creating the PKGBUILD ...";
+    QFile file(":/PKGBUILD");
+    file.open(QIODevice::ReadOnly);
+    QByteArray pkgbuild = file.readAll();
+    file.close();
+
+    foreach(QString key, m_pkgbuild_variables.keys())
+    {
+        QString value = m_pkgbuild_variables.value(key);
+        pkgbuild.replace("$"+key, value.toUtf8());
+    }
+
+    // now assemble the source, noextract and md5sums arrays
+
+    QString sources = "source=(\n";
+    QString noextract = "noextract=(\n";
+    QString md5sums = "md5sums=(\n";
+
+    QStringList artifacts;
+    m_features.sort();
+    m_plugins.sort();
+    artifacts << m_features << m_plugins;
+
+    foreach(QString artifact, artifacts)
+    {
+        sources += QString("\t${_updatesite}'%1' \n").arg(artifact);
+
+        // strip the plugins/ and features/ part from the artifact string
+        artifact.replace("plugins/", "");
+        artifact.replace("features/", "");
+
+        noextract += QString("\t'%1' \n").arg(artifact);
+        QString md5 = md5_hashes.value(artifact);
+        md5sums += QString("\t'%1' \n").arg(md5);
+    }
+
+    sources.append(")\n");
+    noextract.append(")\n");
+    md5sums.append(")\n");
+
+    pkgbuild.replace("$SOURCES", sources.toUtf8());
+    pkgbuild.replace("$NOEXTRACT", noextract.toUtf8());
+    pkgbuild.replace("$MD5SUMS", md5sums.toUtf8());
+
+    QFile output;
+    output.setFileName("PKGBUILD");
+    if(!output.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        qDebug() << "Could not open the file in write mode." << endl;
+        std::exit(1);
+    }
+    QTextStream fout(&output);
+    fout << pkgbuild << endl;
+    output.close();
+
+    qDebug() << "PKGBUILD created";
+    quit();
 }
 
 /***************************
@@ -241,7 +326,7 @@ void ConsoleApplication::calculateHashes(QString file, QByteArray &data)
     sha1_hashes.insert(file, sha);
 }
 
-QByteArray * ConsoleApplication::getFileFromZip(QString file, QBuffer *zip)
+QByteArray ConsoleApplication::getFileFromZip(QString file, QBuffer *zip)
 {
     QuaZip zipFile(zip);
     zipFile.open(QuaZip::mdUnzip);
@@ -253,7 +338,7 @@ QByteArray * ConsoleApplication::getFileFromZip(QString file, QBuffer *zip)
     if(!more)
     {
         qDebug() << "The jar file doesn't contain any files.";
-        exit(1);
+        std::exit(1);
     }
 
     while(more)
@@ -269,8 +354,8 @@ QByteArray * ConsoleApplication::getFileFromZip(QString file, QBuffer *zip)
         aFile.close();
     }
 
-    QByteArray * xmlContent = new QByteArray();
-    xmlContent->append(aFile.readAll());
+    QByteArray xmlContent;// = new QByteArray();
+    xmlContent.append(aFile.readAll());
     aFile.close();
     return xmlContent;
 }
