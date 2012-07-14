@@ -5,9 +5,7 @@
 #-------------------------------------------------
 
 
-QT       += core xmlpatterns xml network
-
-QT       -= gui
+QT       += gui xmlpatterns xml network
 
 TARGET = eclipse-artifacts
 CONFIG   += console
@@ -24,12 +22,12 @@ LIBS += -lz
 
 HEADERS += \
     src/downloadmanager.h \
-    src/consoleapplication.h
+    src/application.h
 
 SOURCES += \
     src/main.cpp \
     src/downloadmanager.cpp \
-    src/consoleapplication.cpp
+    src/application.cpp
 
 OTHER_FILES += \
     resources/artifacts.xml \
@@ -40,7 +38,7 @@ OTHER_FILES += \
     3rd-party/QuaZIP/test/* \
     README.md
 
-QMAKE_CXXFLAGS += -Wno-unused-variable -Wno-unused-parameter
+QMAKE_CXXFLAGS += -Wno-unused-variable -Wno-unused-parameter -Wno-reorder
 
 include(3rd-party/QuaZIP/quazip/quazip.pri)
 

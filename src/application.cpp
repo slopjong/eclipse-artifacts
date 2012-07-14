@@ -19,16 +19,19 @@
 #include "quazip.h"
 #include "quazipfile.h"
 
-#include "consoleapplication.h"
+#include "application.h"
 
-ConsoleApplication::ConsoleApplication(int argc, char *argv[]) :
-    QCoreApplication(argc, argv),
+Application::Application(int argc, char *argv[]) :
+    QApplication(argc, argv),
     m_amount_features(0),
     m_amount_plugins(0),
     m_amount_processed_features(0),
     m_amount_processed_plugins(0),
-    m_queryLanguage(QXmlQuery::XQuery10)
+    m_queryLanguage(QXmlQuery::XQuery10),
+    m_gui_mode(false)
 {
+    // connect some event handlers with the download managers, one for each type
+    // such a type is informally 'site.xml', 'feature' and 'plugin'
     connect(&m_site_downloader, SIGNAL(downloadFinished(QBuffer*, QString)),
             SLOT(slotUpdatesiteDownloadFinished(QBuffer*, QString)));
     connect(&m_feature_downloader, SIGNAL(downloadFinished(QBuffer*, QString)),
@@ -37,83 +40,93 @@ ConsoleApplication::ConsoleApplication(int argc, char *argv[]) :
             SLOT(slotPluginDownloadFinished(QBuffer*, QString)));
     connect(this, SIGNAL(createPKGBUILD()), this, SLOT(slotDownloadsFinished()));
 
+    // init the PKGBUILD variable templates which are written to the final PKGBUILD
+    initVariables();
+
     if(argc>1)
-        m_updateSite = argv[1];
+    { // console mode
+
+        QString updateSite = argv[1];
+
+        // append a trailing slash if it's missing
+        int size = updateSite.size();
+        if(updateSite[size-1] != '/')
+            updateSite.append("/");
+
+        // prepend a http:// if missing
+        if(!updateSite.contains("http"))
+            updateSite.prepend("http://");
+
+        m_pkgbuild_variables.insert("UPDATESITE", updateSite);
+    }
     else
-    {
-        qDebug() << "Please provide an update site";
-        std::exit(1);
+    { // gui mode
+        qDebug() << "No update site provided. Starting in gui mode.";
+        m_gui_mode = true;
     }
 
-    // append a trailing slash if it's missing
-    int size = m_updateSite.size();
-    if(m_updateSite[size-1] != '/')
-        m_updateSite.append("/");
-
-    // prepend a http:// if missing
-    if(!m_updateSite.contains("http"))
-        m_updateSite.prepend("http://");
-
-    // add the update site to the PKGBUILD variables
-    m_pkgbuild_variables.insert("UPDATESITE", m_updateSite);
-
-
-    // fill some default values
-    foreach(QString variable, variableTemplates())
-        m_pkgbuild_variables.insert(variable, "");
-
-    m_pkgbuild_variables.insert("ECLIPSEVER", "3.5");
-    m_pkgbuild_variables.insert("LICENSE", "custom");
-    m_pkgbuild_variables.insert("PKGREL", "1");
 }
 
-void ConsoleApplication::process()
+void Application::process()
 {
     QTextStream cin(stdin, QIODevice::ReadOnly);
-    QTextStream cout(stdout, QIODevice::WriteOnly);
+    QTextStream cout(stdout, QIODevice::WriteOnly);    // add the update site to the PKGBUILD variables
 
-    cout
-    << endl
-    << "Please provide some information about the eclipse plugin you're packaging."
-    << endl
-    << "The fields providing a default value can be left blank."
-    << endl
-    << endl;
-
-    foreach(QString variable, variableTemplates())
+    if(m_gui_mode)
     {
-        QString value = m_pkgbuild_variables.value(variable);
-
-        QString defaultMsg = "";
-
-        if(value != "")
-            defaultMsg = QString(" (default=%1) ").arg(value);
-
-        if(variable == "PKGNAME")
-            defaultMsg = QString(" (add the eclipse- prefix) ");
-
-        if(variable == "DEPENDS")
-            defaultMsg = QString(" (list plugins only, space-seperated) ");
-
-        cout << variable.toLower().toLocal8Bit().constData() << defaultMsg << ": ";
-        cout.flush();
-
-        value = cin.readLine();
-
-        if(value != "")
-            m_pkgbuild_variables.insert(variable, value);
+        cout << "The gui part is not yet implemented. Please use the console mode." << endl;
+        // TODO: nothing happens with qApp's exit and quit methods
+        qApp->exit();
+        qApp->quit();
+        std::exit(0);
     }
+    else
+    {
+        m_pkgbuild_variables.insert("UPDATESITE", "");
 
-    QString url = m_updateSite;
-    url.append("site.xml");
-    m_site_downloader.get(url);
+        cout
+        << endl
+        << "Please provide some information about the eclipse plugin you're packaging."
+        << endl
+        << "The fields providing a default value can be left blank."
+        << endl
+        << endl;
+
+        foreach(QString variable, variableTemplates())
+        {
+            QString value = m_pkgbuild_variables.value(variable);
+
+            QString defaultMsg = "";
+
+            if(value != "")
+                defaultMsg = QString(" (default=%1) ").arg(value);
+
+            if(variable == "PKGNAME")
+                defaultMsg = QString(" (add the eclipse- prefix) ");
+
+            if(variable == "DEPENDS")
+                defaultMsg = QString(" (list plugins only, space-seperated) ");
+
+            cout << variable.toLower().toLocal8Bit().constData() << defaultMsg << ": ";
+            cout.flush();
+
+            value = cin.readLine();
+
+            if(value != "")
+                m_pkgbuild_variables.insert(variable, value);
+        }
+
+        QString url = m_pkgbuild_variables.value("UPDATESITE");
+        url.append("site.xml");
+        m_site_downloader.get(url);
+    }
 }
 
 /***************************
  * SLOTS
  ***************************/
 
-void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml, QString fileName)
+void Application::slotUpdatesiteDownloadFinished(QBuffer *siteXml, QString fileName)
 {
     qDebug() << "Downloaded site.xml from the update site.";
 
@@ -173,14 +186,15 @@ void ConsoleApplication::slotUpdatesiteDownloadFinished(QBuffer *siteXml, QStrin
     m_amount_features.fetch_add(features.size());
     m_features << features;
 
+    QString updateSite = m_pkgbuild_variables.value("UPDATESITE");
     foreach(QString feature, features)
-        m_feature_downloader.get(QString("%1%2").arg(m_updateSite).arg(feature));
+        m_feature_downloader.get(QString("%1%2").arg(updateSite).arg(feature));
 
     siteXml->close();
     delete siteXml;
 }
 
-void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data, QString fileName)
+void Application::slotFeatureDownloadFinished(QBuffer *data, QString fileName)
 {
     qDebug() << QString("Feature downloaded: %1").arg(fileName);
 
@@ -260,9 +274,11 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data, QString file
     m_amount_plugins.fetch_add(plugins.size());
     m_plugins << plugins;
 
+    QString updateSite = m_pkgbuild_variables.value("UPDATESITE");
+
     foreach(QString plugin, plugins)
     {
-        QString downloadUrl = m_updateSite;
+        QString downloadUrl = updateSite;
         downloadUrl.append(plugin);
 
         m_plugin_downloader.get(downloadUrl);
@@ -274,7 +290,7 @@ void ConsoleApplication::slotFeatureDownloadFinished(QBuffer *data, QString file
 }
 
 
-void ConsoleApplication::slotPluginDownloadFinished(QBuffer *data, QString fileName)
+void Application::slotPluginDownloadFinished(QBuffer *data, QString fileName)
 {
     data->open(QIODevice::ReadOnly);
     QByteArray bytes = data->readAll();
@@ -294,7 +310,7 @@ void ConsoleApplication::slotPluginDownloadFinished(QBuffer *data, QString fileN
         emit createPKGBUILD();
 }
 
-void ConsoleApplication::slotDownloadsFinished()
+void Application::slotDownloadsFinished()
 {
     QFile file(":/PKGBUILD");
     file.open(QIODevice::ReadOnly);
@@ -373,7 +389,7 @@ void ConsoleApplication::slotDownloadsFinished()
  * HELPERS
  ***************************/
 
-void ConsoleApplication::calculateHashes(QString file, QByteArray &data)
+void Application::calculateHashes(QString file, QByteArray &data)
 {
     QString md5 = QString(QCryptographicHash::hash(data, QCryptographicHash::Md5).toHex());
     QString sha = QString(QCryptographicHash::hash(data, QCryptographicHash::Sha1).toHex());
@@ -381,7 +397,7 @@ void ConsoleApplication::calculateHashes(QString file, QByteArray &data)
     sha1_hashes.insert(file, sha);
 }
 
-QByteArray ConsoleApplication::getFileFromZip(QString file, QBuffer *zip)
+QByteArray Application::getFileFromZip(QString file, QBuffer *zip)
 {
     QuaZip zipFile(zip);
     zipFile.open(QuaZip::mdUnzip);
@@ -415,18 +431,37 @@ QByteArray ConsoleApplication::getFileFromZip(QString file, QBuffer *zip)
     return xmlContent;
 }
 
-bool ConsoleApplication::downloadsFinished()
+bool Application::downloadsFinished()
 {
    bool pluginsReady = m_amount_plugins == m_amount_processed_plugins;
    bool featuresReady = m_amount_features == m_amount_processed_features;
    return pluginsReady && featuresReady;
 }
 
-QStringList ConsoleApplication::variableTemplates()
+QStringList Application::variableTemplates()
 {
     QStringList variables;
     variables << "MAINTAINER" << "EMAIL" << "PKGNAME" << "PKGVER" << "PKGREL"
               << "DESCRIPTION" << "URL" << "LICENSE" << "ECLIPSEVER" << "DEPENDS";
 
     return variables;
+}
+
+void Application::initVariables()
+{
+    // fill all variables with empty values
+    foreach(QString variable, variableTemplates())
+        m_pkgbuild_variables.insert(variable, "");
+
+    // set default values for some specific variables
+    m_pkgbuild_variables.insert("ECLIPSEVER", "3.5");
+    m_pkgbuild_variables.insert("LICENSE", "custom");
+    m_pkgbuild_variables.insert("PKGREL", "1");
+
+    // add the update site to the PKGBUILD variables
+    // because it's not in the variable template list
+    // because the user won't be asked for it during
+    // the cli input but is required to pass it as an
+    // argument
+    m_pkgbuild_variables.insert("UPDATESITE", "");
 }

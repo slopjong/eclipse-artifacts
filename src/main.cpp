@@ -1,9 +1,8 @@
-
-#include "consoleapplication.h"
+#include "application.h"
 
 int main(int argc, char *argv[])
 {
-    ConsoleApplication a(argc, argv);
+    Application a(argc, argv);
     a.process();
     return a.exec();
 }

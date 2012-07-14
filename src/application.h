@@ -1,7 +1,7 @@
 #ifndef CONSOLEAPPLICATION_H
 #define CONSOLEAPPLICATION_H
 
-#include <QCoreApplication>
+#include <QtGui/QApplication>
 
 #include <QtCore/QBuffer>
 #include <QtCore/QStringList>
@@ -13,15 +13,17 @@
 
 #include "downloadmanager.h"
 
-class ConsoleApplication : public QCoreApplication
+class Application : public QApplication
 {
     Q_OBJECT
 
 public:
-    ConsoleApplication(int argc, char *argv[]);
+    Application(int argc, char *argv[]);
     void process();
     
 private:
+
+    bool m_gui_mode;
 
     DownloadManager m_site_downloader;
     DownloadManager m_feature_downloader;
@@ -29,7 +31,6 @@ private:
 
     QXmlQuery::QueryLanguage m_queryLanguage;
 
-    QString m_updateSite;
     QStringList m_features;
     QStringList m_plugins;
 
@@ -48,6 +49,7 @@ private:
     void calculateHashes(QString file, QByteArray & data);
     bool downloadsFinished();
     QStringList variableTemplates();
+    void initVariables();
 
 signals:
 
