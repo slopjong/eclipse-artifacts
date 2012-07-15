@@ -72,6 +72,7 @@ void Application::process()
     if(m_gui_mode)
     {
         m_gui = new MainWindow;
+        m_gui->initInput(m_pkgbuild_variables);
         m_gui->show();
 
         // connect some event handlers to the gui
@@ -80,8 +81,13 @@ void Application::process()
         connect(this, SIGNAL(updatesiteInvalid()), m_gui, SLOT(slotUpdatesiteInvalid()));
         connect(this, SIGNAL(updatesiteLoading()), m_gui, SLOT(slotUpdatesiteLoading()));
 
+        connect(this, SIGNAL(progressChanged(int)), m_gui, SLOT(slotProgressChanged(int)));
+        connect(this, SIGNAL(progressMaximumChanged(int)), m_gui, SLOT(slotProgressMaxChanged(int)));
+
         connect(this, SIGNAL(downloadsFinished()), m_gui, SLOT(slotShowGenerateButton()));
         connect(m_gui, SIGNAL(generatePkgbuild()), this, SLOT(slotCreatePkgbuild()));
+        connect(m_gui, SIGNAL(inputChanged(QHash<QString,QString>)),
+                this, SLOT(slotSetPkgbuildVariables(QHash<QString,QString>)));
     }
     else
     {
@@ -192,6 +198,8 @@ void Application::slotUpdatesiteDownloadFinished(QBuffer *siteXml, QString fileN
     }
 
     m_amount_features.fetch_add(features.size());
+    emit progressMaximumChanged(m_amount_features + m_amount_plugins);
+
     m_features << features;
 
     QString updateSite = m_pkgbuild_variables.value("UPDATESITE");
@@ -204,6 +212,9 @@ void Application::slotUpdatesiteDownloadFinished(QBuffer *siteXml, QString fileN
 
 void Application::slotFeatureDownloadFinished(QBuffer *data, QString fileName)
 {
+    m_amount_processed_features.fetch_add(1);
+    emit progressChanged(m_amount_processed_features + m_amount_processed_plugins);
+
     qDebug() << QString("Feature downloaded: %1").arg(fileName);
 
     if(!data->open(QIODevice::ReadOnly))
@@ -280,6 +291,8 @@ void Application::slotFeatureDownloadFinished(QBuffer *data, QString fileName)
     }
 
     m_amount_plugins.fetch_add(plugins.size());
+    emit progressMaximumChanged(m_amount_features + m_amount_plugins);
+
     m_plugins << plugins;
 
     QString updateSite = m_pkgbuild_variables.value("UPDATESITE");
@@ -293,8 +306,6 @@ void Application::slotFeatureDownloadFinished(QBuffer *data, QString fileName)
     }
 
     featureDocument.close();
-
-    m_amount_processed_features.fetch_add(1);
 }
 
 
@@ -308,6 +319,7 @@ void Application::slotPluginDownloadFinished(QBuffer *data, QString fileName)
     delete data;
 
     m_amount_processed_plugins.fetch_add(1);
+    emit progressChanged(m_amount_processed_features + m_amount_processed_plugins);
 
     qDebug() << QString("Plugin downloaded: %1/%2 => %3")
                 .arg(m_amount_processed_plugins)
@@ -390,7 +402,10 @@ void Application::slotCreatePkgbuild()
     output.close();
 
     qDebug() << "PKGBUILD created";
-    quit();
+
+    // if we are in console mode quit now
+    if(!m_gui_mode)
+        quit();
 }
 
 void Application::slotUpdatesiteChanged(QString updateSite)
@@ -419,6 +434,11 @@ void Application::slotHeadRequestFinished(QNetworkReply *reply)
         emit updatesiteInvalid();
 
     reply->deleteLater();
+}
+
+void Application::slotSetPkgbuildVariables(QHash<QString, QString> input)
+{
+    m_pkgbuild_variables.unite(input);
 }
 
 /***************************

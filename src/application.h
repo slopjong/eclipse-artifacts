@@ -67,6 +67,8 @@ signals:
     void updatesiteValid();
     void updatesiteInvalid();
     void updatesiteLoading();
+    void progressMaximumChanged(int max);
+    void progressChanged(int amount);
     
 public slots:
 
@@ -78,6 +80,7 @@ private slots:
     void slotCreatePkgbuild();
     void slotUpdatesiteChanged(QString updateSite);
     void slotHeadRequestFinished(QNetworkReply *reply);
+    void slotSetPkgbuildVariables(QHash<QString, QString> input);
     
 };
 

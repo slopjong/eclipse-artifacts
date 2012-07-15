@@ -46,6 +46,23 @@ void MainWindow::slotShowGenerateButton()
     ui->generateButton->setEnabled(true);
 }
 
+void MainWindow::slotProgressChanged(int progress)
+{
+    ui->progressBar->setValue(progress);
+}
+
+void MainWindow::slotProgressMaxChanged(int max)
+{
+    ui->progressBar->setMaximum(max);
+}
+
+void MainWindow::initInput(QHash<QString, QString> input)
+{
+    ui->iPkgrel->setText(input.value("PKGREL"));
+    ui->iEclipsever->setText(input.value("ECLIPSEVER"));
+    ui->iLicense->setText(input.value("LICENSE"));
+}
+
 void MainWindow::slotUpdatesiteChanged(QString updateSite)
 {
     emit updatesiteChanged(updateSite);
@@ -53,5 +70,19 @@ void MainWindow::slotUpdatesiteChanged(QString updateSite)
 
 void MainWindow::slotGenerateButtonClicked()
 {
+    QHash<QString, QString> input;
+
+    input.insert("MAINTAINER", ui->iMaintainer->text());
+    input.insert("EMAIL", ui->iEmail->text());
+    input.insert("PKGNAME", ui->iPkgname->text());
+    input.insert("PKGVER", ui->iPkgver->text());
+    input.insert("PKGREL", ui->iPkgrel->text());
+    input.insert("DESCRIPTION", ui->iPkgdesc->text());
+    input.insert("URL", ui->iUrl->text());
+    input.insert("ECLIPSEVER", ui->iEclipsever->text());
+    input.insert("LICENSE", ui->iLicense->text());
+    input.insert("DEPENDS", ui->iDeps->text());
+
+    emit inputChanged(input);
     emit generatePkgbuild();
 }
