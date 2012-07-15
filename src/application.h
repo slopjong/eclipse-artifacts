@@ -75,7 +75,7 @@ private slots:
     void slotUpdatesiteDownloadFinished(QBuffer *data, QString fileName);
     void slotFeatureDownloadFinished(QBuffer *data, QString fileName);
     void slotPluginDownloadFinished(QBuffer *data, QString fileName);
-    void slotDownloadsFinished();
+    void slotCreatePkgbuild();
     void slotUpdatesiteChanged(QString updateSite);
     void slotHeadRequestFinished(QNetworkReply *reply);
     

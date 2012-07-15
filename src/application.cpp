@@ -38,7 +38,7 @@ Application::Application(int argc, char *argv[]) :
     connect(&m_plugin_downloader, SIGNAL(downloadFinished(QBuffer*, QString)),
             SLOT(slotPluginDownloadFinished(QBuffer*, QString)));
     connect(this, SIGNAL(createPKGBUILD()),
-            this, SLOT(slotDownloadsFinished()));
+            this, SLOT(slotCreatePkgbuild()));
     connect(&m_head_request, SIGNAL(finished(QNetworkReply*)),
             this, SLOT(slotHeadRequestFinished(QNetworkReply*)));
 
@@ -313,7 +313,7 @@ void Application::slotPluginDownloadFinished(QBuffer *data, QString fileName)
         emit createPKGBUILD();
 }
 
-void Application::slotDownloadsFinished()
+void Application::slotCreatePkgbuild()
 {
     QFile file(":/PKGBUILD");
     file.open(QIODevice::ReadOnly);
