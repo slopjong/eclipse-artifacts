@@ -18,6 +18,11 @@ public:
 private:
     Ui::MainWindow *ui;
 
+public slots:
+    void slotUpdatesiteValid();
+    void slotUpdatesiteInvalid();
+    void slotUpdatesiteLoading();
+
 private slots:
 
     void slotUpdatesiteChanged(QString updateSite);

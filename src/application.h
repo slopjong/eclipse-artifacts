@@ -63,6 +63,9 @@ private:
 signals:
 
     void createPKGBUILD();
+    void updatesiteValid();
+    void updatesiteInvalid();
+    void updatesiteLoading();
     
 public slots:
 

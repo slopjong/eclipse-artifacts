@@ -1,5 +1,5 @@
 Makefile
-*.pro.user
+*.pro.user*
 *.o
 ./eclipse-artifacts
 eclipse-artifacts

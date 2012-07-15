@@ -86,6 +86,9 @@ void Application::process()
 
         // connect some event handlers to the gui
         connect(m_gui, SIGNAL(updatesiteChanged(QString)), this, SLOT(slotUpdatesiteChanged(QString)));
+        connect(this, SIGNAL(updatesiteValid()), m_gui, SLOT(slotUpdatesiteValid()));
+        connect(this, SIGNAL(updatesiteInvalid()), m_gui, SLOT(slotUpdatesiteInvalid()));
+        connect(this, SIGNAL(updatesiteLoading()), m_gui, SLOT(slotUpdatesiteLoading()));
     }
     else
     {
@@ -396,16 +399,22 @@ void Application::slotDownloadsFinished()
 
 void Application::slotUpdatesiteChanged(QString updateSite)
 {
-    qDebug() << updateSite;
+    emit updatesiteLoading();
     QNetworkRequest req(updateSite);
-
     m_head_request.head(req);
 }
 
 void Application::slotHeadRequestFinished(QNetworkReply *reply)
 {
-    QVariant attr = reply->request().attribute(QNetworkRequest::HttpStatusCodeAttribute);
-    qDebug() << attr.toString();
+    QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    int iStatusCode = statusCode.toInt();
+
+    if(iStatusCode == 200)
+        emit updatesiteValid();
+    else
+        emit updatesiteInvalid();
+
+    reply->deleteLater();
 }
 
 /***************************
