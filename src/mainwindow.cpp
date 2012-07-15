@@ -1,3 +1,4 @@
+#include <QtGui/QMovie>
 #include <QtGui/QPixmap>
 
 #include "mainwindow.h"
@@ -30,8 +31,10 @@ void MainWindow::slotUpdatesiteInvalid()
 
 void MainWindow::slotUpdatesiteLoading()
 {
-    QPixmap pixmap(QString::fromUtf8(":/loading"));
-    ui->icon->setPixmap(pixmap.scaled(75,75, Qt::KeepAspectRatio));
+    QMovie * animation = new QMovie(QString::fromUtf8(":/loading"), QByteArray(), this);
+    animation->setScaledSize(QSize(75,75));
+    animation->start();
+    ui->icon->setMovie(animation);
 }
 
 void MainWindow::slotUpdatesiteChanged(QString updateSite)
