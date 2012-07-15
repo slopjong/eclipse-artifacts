@@ -49,16 +49,7 @@ Application::Application(int argc, char *argv[]) :
     { // console mode
 
         QString updateSite = argv[1];
-
-        // append a trailing slash if it's missing
-        int size = updateSite.size();
-        if(updateSite[size-1] != '/')
-            updateSite.append("/");
-
-        // prepend a http:// if missing
-        if(!updateSite.contains("http"))
-            updateSite.prepend("http://");
-
+        updateSite = sanitizeUpdatesite(updateSite);
         m_pkgbuild_variables.insert("UPDATESITE", updateSite);
     }
     else
@@ -400,6 +391,8 @@ void Application::slotDownloadsFinished()
 void Application::slotUpdatesiteChanged(QString updateSite)
 {
     emit updatesiteLoading();
+    updateSite = sanitizeUpdatesite(updateSite);
+    updateSite.append("site.xml");
     QNetworkRequest req(updateSite);
     m_head_request.head(req);
 }
@@ -410,7 +403,12 @@ void Application::slotHeadRequestFinished(QNetworkReply *reply)
     int iStatusCode = statusCode.toInt();
 
     if(iStatusCode == 200)
+    {
         emit updatesiteValid();
+        QString url = reply->url().toString();
+        QString updateSite = url.replace("site.xml", "");
+        m_pkgbuild_variables.insert("UPDATESITE", updateSite);
+    }
     else
         emit updatesiteInvalid();
 
@@ -496,4 +494,18 @@ void Application::initVariables()
     // the cli input but is required to pass it as an
     // argument
     m_pkgbuild_variables.insert("UPDATESITE", "");
+}
+
+QString Application::sanitizeUpdatesite(QString updateSite)
+{
+    // append a trailing slash if it's missing
+    int size = updateSite.size();
+    if(updateSite[size-1] != '/')
+        updateSite.append("/");
+
+    // prepend a http:// if missing
+    if(!updateSite.contains("http"))
+        updateSite.prepend("http://");
+
+    return updateSite;
 }

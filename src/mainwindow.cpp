@@ -22,6 +22,7 @@ MainWindow::~MainWindow()
 void MainWindow::slotUpdatesiteValid()
 {
     ui->icon->setPixmap(QPixmap(QString::fromUtf8(":/valid")));
+    ui->stackedWidget->setCurrentIndex(1);
 }
 
 void MainWindow::slotUpdatesiteInvalid()

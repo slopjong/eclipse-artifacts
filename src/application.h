@@ -59,6 +59,7 @@ private:
     bool downloadsFinished();
     QStringList variableTemplates();
     void initVariables();
+    QString sanitizeUpdatesite(QString updateSite);
 
 signals:
 
