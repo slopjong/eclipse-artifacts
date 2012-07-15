@@ -37,7 +37,10 @@ Application::Application(int argc, char *argv[]) :
             SLOT(slotFeatureDownloadFinished(QBuffer*, QString)));
     connect(&m_plugin_downloader, SIGNAL(downloadFinished(QBuffer*, QString)),
             SLOT(slotPluginDownloadFinished(QBuffer*, QString)));
-    connect(this, SIGNAL(createPKGBUILD()), this, SLOT(slotDownloadsFinished()));
+    connect(this, SIGNAL(createPKGBUILD()),
+            this, SLOT(slotDownloadsFinished()));
+    connect(&m_head_request, SIGNAL(finished(QNetworkReply*)),
+            this, SLOT(slotHeadRequestFinished(QNetworkReply*)));
 
     // init the PKGBUILD variable templates which are written to the final PKGBUILD
     initVariables();
@@ -393,9 +396,9 @@ void Application::slotDownloadsFinished()
 
 void Application::slotUpdatesiteChanged(QString updateSite)
 {
+    qDebug() << updateSite;
     QNetworkRequest req(updateSite);
-    connect(&m_head_request, SIGNAL(finished(QNetworkReply*)),
-            this, SLOT(slotHeadRequestFinished(QNetworkReply*)));
+
     m_head_request.head(req);
 }
 
