@@ -15,6 +15,8 @@ QMAKE_CXXFLAGS += -std=gnu++11
 
 OBJECTS_DIR = build/objects
 MOC_DIR = build/moc
+UI_HEADERS_DIR = src
+UI_SOURCES_DIR = src
 
 TEMPLATE = app
 
@@ -22,18 +24,17 @@ LIBS += -lz
 
 HEADERS += \
     src/downloadmanager.h \
-    src/application.h
+    src/application.h \
+    src/mainwindow.h
 
 SOURCES += \
     src/main.cpp \
     src/downloadmanager.cpp \
-    src/application.cpp
+    src/application.cpp \
+    src/mainwindow.cpp
 
 OTHER_FILES += \
-    resources/artifacts.xml \
-    resources/feature.xml \
-    resources/com.onpositive.gae.appwrench_1.5.0.jar \
-    resources/PKGBUILD \
+    resources/* \
     3rd-party/QuaZIP/quazip/* \
     3rd-party/QuaZIP/test/* \
     README.md
@@ -44,3 +45,6 @@ include(3rd-party/QuaZIP/quazip/quazip.pri)
 
 RESOURCES += \
     resources.qrc
+
+FORMS += \
+    src/mainwindow.ui

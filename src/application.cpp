@@ -16,10 +16,9 @@
 #include <iostream>
 #include <string>
 
+#include "application.h"
 #include "quazip.h"
 #include "quazipfile.h"
-
-#include "application.h"
 
 Application::Application(int argc, char *argv[]) :
     QApplication(argc, argv),
@@ -74,11 +73,13 @@ void Application::process()
 
     if(m_gui_mode)
     {
-        cout << "The gui part is not yet implemented. Please use the console mode." << endl;
+        m_mainwindow = new MainWindow;
+        m_mainwindow->show();
+        ///cout << "The gui part is not yet implemented. Please use the console mode." << endl;
         // TODO: nothing happens with qApp's exit and quit methods
-        qApp->exit();
-        qApp->quit();
-        std::exit(0);
+        //qApp->exit();
+        ///qApp->quit();
+        ///std::exit(0);
     }
     else
     {

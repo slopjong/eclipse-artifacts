@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/">
         <file alias="PKGBUILD">resources/PKGBUILD</file>
+        <file alias="archlinux_banner">resources/archlinux_banner.png</file>
+        <file alias="not_valid">resources/not_valid.png</file>
+        <file alias="valid">resources/valid.png</file>
     </qresource>
 </RCC>

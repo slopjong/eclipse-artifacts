@@ -5,3 +5,6 @@ Makefile
 eclipse-artifacts
 qrc_*.cpp
 moc_*.cpp
+src/ui_*
+build
+*.autosave

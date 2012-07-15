@@ -12,6 +12,7 @@
 #include <atomic>
 
 #include "downloadmanager.h"
+#include "mainwindow.h"
 
 class Application : public QApplication
 {
@@ -22,6 +23,8 @@ public:
     void process();
     
 private:
+
+    MainWindow *m_mainwindow;
 
     bool m_gui_mode;
 
