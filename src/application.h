@@ -56,14 +56,14 @@ private:
 
     QByteArray getFileFromZip(QString file, QBuffer *zip);
     void calculateHashes(QString file, QByteArray & data);
-    bool downloadsFinished();
+    bool isDownloadsFinished();
     QStringList variableTemplates();
     void initVariables();
     QString sanitizeUpdatesite(QString updateSite);
 
 signals:
 
-    void createPKGBUILD();
+    void downloadsFinished();
     void updatesiteValid();
     void updatesiteInvalid();
     void updatesiteLoading();

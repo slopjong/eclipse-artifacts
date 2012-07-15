@@ -17,6 +17,7 @@
 #include <string>
 
 #include "application.h"
+#include "mainwindow.h"
 #include "quazip.h"
 #include "quazipfile.h"
 
@@ -37,8 +38,6 @@ Application::Application(int argc, char *argv[]) :
             SLOT(slotFeatureDownloadFinished(QBuffer*, QString)));
     connect(&m_plugin_downloader, SIGNAL(downloadFinished(QBuffer*, QString)),
             SLOT(slotPluginDownloadFinished(QBuffer*, QString)));
-    connect(this, SIGNAL(createPKGBUILD()),
-            this, SLOT(slotCreatePkgbuild()));
     connect(&m_head_request, SIGNAL(finished(QNetworkReply*)),
             this, SLOT(slotHeadRequestFinished(QNetworkReply*)));
 
@@ -50,7 +49,7 @@ Application::Application(int argc, char *argv[]) :
 
         QString updateSite = argv[1];
         updateSite = sanitizeUpdatesite(updateSite);
-        m_pkgbuild_variables.insert("UPDATESITE", updateSite);
+        m_pkgbuild_variables.insert("UPDATESITE", updateSite);        
     }
     else
     { // gui mode
@@ -80,9 +79,15 @@ void Application::process()
         connect(this, SIGNAL(updatesiteValid()), m_gui, SLOT(slotUpdatesiteValid()));
         connect(this, SIGNAL(updatesiteInvalid()), m_gui, SLOT(slotUpdatesiteInvalid()));
         connect(this, SIGNAL(updatesiteLoading()), m_gui, SLOT(slotUpdatesiteLoading()));
+
+        connect(this, SIGNAL(downloadsFinished()), m_gui, SLOT(slotShowGenerateButton()));
+        connect(m_gui, SIGNAL(generatePkgbuild()), this, SLOT(slotCreatePkgbuild()));
     }
     else
     {
+        connect(this, SIGNAL(downloadsFinished()),
+                this, SLOT(slotCreatePkgbuild()));
+
         m_pkgbuild_variables.insert("UPDATESITE", "");
 
         cout
@@ -309,8 +314,8 @@ void Application::slotPluginDownloadFinished(QBuffer *data, QString fileName)
                 .arg(m_amount_plugins)
                 .arg(fileName);
 
-    if(downloadsFinished())
-        emit createPKGBUILD();
+    if(isDownloadsFinished())
+        emit downloadsFinished();
 }
 
 void Application::slotCreatePkgbuild()
@@ -406,6 +411,7 @@ void Application::slotHeadRequestFinished(QNetworkReply *reply)
     {
         emit updatesiteValid();
         QString url = reply->url().toString();
+        m_site_downloader.get(url);
         QString updateSite = url.replace("site.xml", "");
         m_pkgbuild_variables.insert("UPDATESITE", updateSite);
     }
@@ -461,7 +467,7 @@ QByteArray Application::getFileFromZip(QString file, QBuffer *zip)
     return xmlContent;
 }
 
-bool Application::downloadsFinished()
+bool Application::isDownloadsFinished()
 {
    bool pluginsReady = m_amount_plugins == m_amount_processed_plugins;
    bool featuresReady = m_amount_features == m_amount_processed_features;

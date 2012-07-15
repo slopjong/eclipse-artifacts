@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->generateButton->setHidden(true);
 
     connect(ui->inputUpdatesite, SIGNAL(textChanged(QString)), this, SLOT(slotUpdatesiteChanged(QString)));
+    connect(ui->generateButton, SIGNAL(clicked()), this, SLOT(slotGenerateButtonClicked()));
 }
 
 MainWindow::~MainWindow()
@@ -38,7 +39,19 @@ void MainWindow::slotUpdatesiteLoading()
     ui->icon->setMovie(animation);
 }
 
+void MainWindow::slotShowGenerateButton()
+{
+    ui->progressBar->hide();
+    ui->generateButton->show();
+    ui->generateButton->setEnabled(true);
+}
+
 void MainWindow::slotUpdatesiteChanged(QString updateSite)
 {
     emit updatesiteChanged(updateSite);
+}
+
+void MainWindow::slotGenerateButtonClicked()
+{
+    emit generatePkgbuild();
 }
