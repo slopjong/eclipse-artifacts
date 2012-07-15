@@ -66,6 +66,11 @@ Application::Application(int argc, char *argv[]) :
 
 }
 
+Application::~Application()
+{
+    delete m_gui;
+}
+
 void Application::process()
 {
     QTextStream cin(stdin, QIODevice::ReadOnly);
@@ -73,13 +78,11 @@ void Application::process()
 
     if(m_gui_mode)
     {
-        m_mainwindow = new MainWindow;
-        m_mainwindow->show();
-        ///cout << "The gui part is not yet implemented. Please use the console mode." << endl;
-        // TODO: nothing happens with qApp's exit and quit methods
-        //qApp->exit();
-        ///qApp->quit();
-        ///std::exit(0);
+        m_gui = new MainWindow;
+        m_gui->show();
+
+        // connect some event handlers to the gui
+        connect(m_gui, SIGNAL(updatesiteChanged(QString)), this, SLOT(slotUpdatesiteChanged(QString)));
     }
     else
     {
@@ -126,6 +129,8 @@ void Application::process()
 /***************************
  * SLOTS
  ***************************/
+
+
 
 void Application::slotUpdatesiteDownloadFinished(QBuffer *siteXml, QString fileName)
 {
@@ -384,6 +389,20 @@ void Application::slotDownloadsFinished()
 
     qDebug() << "PKGBUILD created";
     quit();
+}
+
+void Application::slotUpdatesiteChanged(QString updateSite)
+{
+    QNetworkRequest req(updateSite);
+    connect(&m_head_request, SIGNAL(finished(QNetworkReply*)),
+            this, SLOT(slotHeadRequestFinished(QNetworkReply*)));
+    m_head_request.head(req);
+}
+
+void Application::slotHeadRequestFinished(QNetworkReply *reply)
+{
+    QVariant attr = reply->request().attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    qDebug() << attr.toString();
 }
 
 /***************************

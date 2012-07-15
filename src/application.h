@@ -7,6 +7,10 @@
 #include <QtCore/QStringList>
 #include <QtCore/QHash>
 
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkReply>
+#include <QtNetwork/QNetworkRequest>
+
 #include <QtXmlPatterns/QXmlQuery>
 
 #include <atomic>
@@ -20,17 +24,19 @@ class Application : public QApplication
 
 public:
     Application(int argc, char *argv[]);
+    ~Application();
     void process();
     
 private:
 
-    MainWindow *m_mainwindow;
+    MainWindow *m_gui;
 
     bool m_gui_mode;
 
     DownloadManager m_site_downloader;
     DownloadManager m_feature_downloader;
     DownloadManager m_plugin_downloader;
+    QNetworkAccessManager m_head_request;
 
     QXmlQuery::QueryLanguage m_queryLanguage;
 
@@ -66,6 +72,8 @@ private slots:
     void slotFeatureDownloadFinished(QBuffer *data, QString fileName);
     void slotPluginDownloadFinished(QBuffer *data, QString fileName);
     void slotDownloadsFinished();
+    void slotUpdatesiteChanged(QString updateSite);
+    void slotHeadRequestFinished(QNetworkReply *reply);
     
 };
 

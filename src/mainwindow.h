@@ -17,6 +17,14 @@ public:
     
 private:
     Ui::MainWindow *ui;
+
+private slots:
+
+    void slotUpdatesiteChanged(QString updateSite);
+
+signals:
+    void updatesiteChanged(QString updateSite);
+
 };
 
 #endif // MAINWINDOW_H
