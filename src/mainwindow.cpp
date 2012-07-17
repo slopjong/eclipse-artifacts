@@ -42,18 +42,28 @@ void MainWindow::slotUpdatesiteLoading()
 void MainWindow::slotShowGenerateButton()
 {
     ui->progressBar->hide();
+    ui->fileDownloading->hide();
     ui->generateButton->show();
     ui->generateButton->setEnabled(true);
 }
 
 void MainWindow::slotProgressChanged(int progress)
 {
+    int max = ui->progressBar->maximum();
+    int val = ui->progressBar->value();
     ui->progressBar->setValue(progress);
+    QString label = QString("Downloaded %1 artifacts of %2.").arg(val).arg(max);
+    ui->fileDownloading->setText(label);
 }
 
 void MainWindow::slotProgressMaxChanged(int max)
 {
     ui->progressBar->setMaximum(max);
+}
+
+void MainWindow::slotFileDownloading(QString fileName)
+{
+    ui->fileDownloading->setText(fileName.prepend("Downloading "));
 }
 
 void MainWindow::initInput(QHash<QString, QString> input)

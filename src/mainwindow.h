@@ -27,6 +27,7 @@ public slots:
     void slotShowGenerateButton();
     void slotProgressChanged(int progress);
     void slotProgressMaxChanged(int max);
+    void slotFileDownloading(QString fileName);
 
 private slots:
 

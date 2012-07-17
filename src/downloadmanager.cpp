@@ -13,10 +13,16 @@ DownloadManager::DownloadManager(QObject *parent) :
             SLOT(slotFinished(QNetworkReply *)));
 }
 
-void DownloadManager::get(QString url)
+void DownloadManager::get(QUrl url)
 {
     QNetworkRequest request(url);
     QNetworkAccessManager::get(request);
+
+    QString fileName = QFileInfo(url.path()).fileName();
+
+    // this signal doesn't make much sense, the requests are queued
+    // and thus it can't be used to display a progress
+    //emit downloadingFile(fileName);
 }
 
 /**

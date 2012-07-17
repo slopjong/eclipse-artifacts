@@ -2,6 +2,7 @@
 #define DOWNLOADMANAGER_H
 
 #include <QObject>
+#include <QtCore/QUrl>
 #include <QtNetwork/QNetworkAccessManager>
 
 #include <QtCore/QByteArray>
@@ -16,10 +17,12 @@ class DownloadManager : public QNetworkAccessManager
 
 public:
     explicit DownloadManager(QObject *parent = 0);
-    void get(QString url);
+    void get(QUrl url);
 
 signals:
-    
+
+    // this signal doesn't make much sense, the requests are queued
+    void downloadingFile(QString file);
     void downloadFinished(QBuffer * buffer, QString fileName);
 
 public slots:
