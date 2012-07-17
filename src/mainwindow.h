@@ -15,7 +15,7 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-    //friend class ResizeAnimation;
+    friend class ResizeAnimation;
 
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -41,7 +41,6 @@ private slots:
     void slotUpdatesiteChanged(QString updateSite);
     void slotGenerateButtonClicked();
     void slotWaitOnValid();
-    void slotResize();
 
 signals:
     void updatesiteChanged(QString updateSite);

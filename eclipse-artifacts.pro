@@ -25,13 +25,15 @@ LIBS += -lz
 HEADERS += \
     src/downloadmanager.h \
     src/application.h \
-    src/mainwindow.h
+    src/mainwindow.h \
+    src/resizeanimation.h
 
 SOURCES += \
     src/main.cpp \
     src/downloadmanager.cpp \
     src/application.cpp \
-    src/mainwindow.cpp
+    src/mainwindow.cpp \
+    src/resizeanimation.cpp
 
 OTHER_FILES += \
     resources/* \

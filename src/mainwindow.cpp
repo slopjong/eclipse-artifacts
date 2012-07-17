@@ -4,6 +4,7 @@
 #include <QtGui/QPixmap>
 
 #include "mainwindow.h"
+#include "resizeanimation.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -103,19 +104,6 @@ void MainWindow::slotGenerateButtonClicked()
 
 void MainWindow::slotWaitOnValid()
 {
-    ui->stackedWidget->setCurrentIndex(1);
-
-    resizeTimer = new QTimer(this);
-    connect(resizeTimer, SIGNAL(timeout()), this, SLOT(slotResize()));
-    resizeTimer->start(5);
-}
-
-void MainWindow::slotResize()
-{
-    QSize s(size());
-    s.setHeight(s.height()+1);
-    resize(s);
-
-    if(s.height() == sizeHint().height())
-        resizeTimer->stop();
+    ResizeAnimation *animation = new ResizeAnimation(this, this);
+    animation->start();
 }
