@@ -6,5 +6,6 @@
         <file alias="valid">resources/valid.png</file>
         <file alias="generate">resources/work/work.png</file>
         <file alias="loading">resources/ajax-loader/ajax-loader.gif</file>
+        <file alias="banner">resources/banner/banner.png</file>
     </qresource>
 </RCC>
