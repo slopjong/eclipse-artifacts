@@ -2,7 +2,10 @@
 #define MAINWINDOW_H
 
 #include <QtCore/QHash>
+#include <QtCore/QTimer>
 #include <QtGui/QMainWindow>
+
+#include "ui_mainwindow.h"
 
 namespace Ui {
 class MainWindow;
@@ -12,6 +15,8 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+    //friend class ResizeAnimation;
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -19,6 +24,8 @@ public:
     
 private:
     Ui::MainWindow *ui;
+
+    QTimer *resizeTimer;
 
 public slots:
     void slotUpdatesiteValid();
@@ -33,6 +40,8 @@ private slots:
 
     void slotUpdatesiteChanged(QString updateSite);
     void slotGenerateButtonClicked();
+    void slotWaitOnValid();
+    void slotResize();
 
 signals:
     void updatesiteChanged(QString updateSite);

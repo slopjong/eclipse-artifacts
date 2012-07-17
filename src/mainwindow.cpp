@@ -1,8 +1,9 @@
+#include <QDebug>
+
 #include <QtGui/QMovie>
 #include <QtGui/QPixmap>
 
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -23,8 +24,11 @@ MainWindow::~MainWindow()
 void MainWindow::slotUpdatesiteValid()
 {
     ui->icon->setPixmap(QPixmap(QString::fromUtf8(":/valid")));
-    ui->stackedWidget->setCurrentIndex(1);
+
+    QTimer::singleShot(700, this, SLOT(slotWaitOnValid()));
 }
+
+
 
 void MainWindow::slotUpdatesiteInvalid()
 {
@@ -95,4 +99,23 @@ void MainWindow::slotGenerateButtonClicked()
 
     emit inputChanged(input);
     emit generatePkgbuild();
+}
+
+void MainWindow::slotWaitOnValid()
+{
+    ui->stackedWidget->setCurrentIndex(1);
+
+    resizeTimer = new QTimer(this);
+    connect(resizeTimer, SIGNAL(timeout()), this, SLOT(slotResize()));
+    resizeTimer->start(5);
+}
+
+void MainWindow::slotResize()
+{
+    QSize s(size());
+    s.setHeight(s.height()+1);
+    resize(s);
+
+    if(s.height() == sizeHint().height())
+        resizeTimer->stop();
 }
