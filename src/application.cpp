@@ -473,7 +473,7 @@ void Application::slotPackage()
     process->start("makepkg", QStringList("-s"));
     connect(process, SIGNAL(error(QProcess::ProcessError)),
             this, SLOT(slotProcessError(QProcess::ProcessError)));
-    coneect(process, SIGNAL(finished(int)),
+    connect(process, SIGNAL(finished(int)),
             this, SLOT(slotProcessFinished(int)));
 }
 
@@ -483,7 +483,7 @@ void Application::slotSourcePackage()
     process->start("makepkg", QStringList("-S"));
     connect(process, SIGNAL(error(QProcess::ProcessError)),
             this, SLOT(slotProcessError(QProcess::ProcessError)));
-    coneect(process, SIGNAL(finished(int)),
+    connect(process, SIGNAL(finished(int)),
             this, SLOT(slotProcessFinished(int)));
 }
 
@@ -525,7 +525,7 @@ void Application::slotProcessError(QProcess::ProcessError err)
 
 void Application::slotProcessFinished(int exitCode)
 {
-    qDebug() << "Finished the packaging";
+    qDebug() << QString("Finished the packaging [%1]").arg(exitCode);
 }
 
 /***************************

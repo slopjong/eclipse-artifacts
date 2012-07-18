@@ -88,6 +88,7 @@ private slots:
     void slotPackage();
     void slotSourcePackage();
     void slotProcessError(QProcess::ProcessError);
+    void slotProcessFinished(int exitCode);
     
 };
 

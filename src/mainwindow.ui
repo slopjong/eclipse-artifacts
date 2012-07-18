@@ -313,7 +313,7 @@
            <item>
             <widget class="QPushButton" name="inputMaskButton">
              <property name="text">
-              <string>To previous step</string>
+              <string>Change Input</string>
              </property>
             </widget>
            </item>
