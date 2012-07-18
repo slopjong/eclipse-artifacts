@@ -4,6 +4,7 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QCryptographicHash>
 #include <QtCore/QFile>
+#include <QtCore/QProcess>
 #include <QtCore/QStringList>
 #include <QtCore/QTextStream>
 
@@ -49,6 +50,7 @@ Application::Application(int argc, char *argv[]) :
 
         QString updateSite = argv[1];
         updateSite = sanitizeUpdatesite(updateSite);
+        // add the update site to the PKGBUILD variables
         m_pkgbuild_variables.insert("UPDATESITE", updateSite);        
     }
     else
@@ -67,7 +69,7 @@ Application::~Application()
 void Application::process()
 {
     QTextStream cin(stdin, QIODevice::ReadOnly);
-    QTextStream cout(stdout, QIODevice::WriteOnly);    // add the update site to the PKGBUILD variables
+    QTextStream cout(stdout, QIODevice::WriteOnly);
 
     if(m_gui_mode)
     {
@@ -76,23 +78,44 @@ void Application::process()
         m_gui->show();
 
         // connect some event handlers to the gui
-        connect(m_gui, SIGNAL(updatesiteChanged(QString)), this, SLOT(slotUpdatesiteChanged(QString)));
-        connect(this, SIGNAL(updatesiteValid()), m_gui, SLOT(slotUpdatesiteValid()));
-        connect(this, SIGNAL(updatesiteInvalid()), m_gui, SLOT(slotUpdatesiteInvalid()));
-        connect(this, SIGNAL(updatesiteLoading()), m_gui, SLOT(slotUpdatesiteLoading()));
+        connect(m_gui, SIGNAL(updatesiteChanged(QString)),
+                this, SLOT(slotUpdatesiteChanged(QString)));
+        connect(this, SIGNAL(updatesiteValid()),
+                m_gui, SLOT(slotUpdatesiteValid()));
+        connect(this, SIGNAL(updatesiteInvalid()),
+                m_gui, SLOT(slotUpdatesiteInvalid()));
+        connect(this, SIGNAL(updatesiteLoading()),
+                m_gui, SLOT(slotUpdatesiteLoading()));
 
-        connect(this, SIGNAL(progressChanged(int)), m_gui, SLOT(slotProgressChanged(int)));
-        connect(this, SIGNAL(progressMaximumChanged(int)), m_gui, SLOT(slotProgressMaxChanged(int)));
+        connect(this, SIGNAL(progressChanged(int)),
+                m_gui, SLOT(slotProgressChanged(int)));
+        connect(this, SIGNAL(progressMaximumChanged(int)),
+                m_gui, SLOT(slotProgressMaxChanged(int)));
 
-        connect(this, SIGNAL(downloadsFinished()), m_gui, SLOT(slotShowGenerateButton()));
-        connect(m_gui, SIGNAL(generatePkgbuild()), this, SLOT(slotCreatePkgbuild()));
+        connect(this, SIGNAL(downloadsFinished()),
+                m_gui, SLOT(slotShowGenerateButton()));
+        connect(m_gui, SIGNAL(generatePkgbuild()),
+                this, SLOT(slotCreatePkgbuild()));
+        connect(this, SIGNAL(pkgbuildGenerated(QByteArray)),
+                m_gui, SLOT(slotPkgbuildGenerated(QByteArray)));
         connect(m_gui, SIGNAL(inputChanged(QHash<QString,QString>)),
                 this, SLOT(slotSetPkgbuildVariables(QHash<QString,QString>)));
+        connect(m_gui, SIGNAL(save(QByteArray)),
+                this, SLOT(slotSave(QByteArray)));
+        connect(m_gui, SIGNAL(package()),
+                this, SLOT(slotPackage()));
+        connect(m_gui, SIGNAL(sourcePackage()),
+                this, SLOT(slotSourcePackage()));
     }
     else
     {
         connect(this, SIGNAL(downloadsFinished()),
                 this, SLOT(slotCreatePkgbuild()));
+
+        connect(this, SIGNAL(pkgbuildGenerated(QByteArray)),
+                this, SLOT(slotSave(QByteArray)));
+
+        connect(this, SIGNAL(pkgbuildSaved()), this, SLOT(quit()));
 
         m_pkgbuild_variables.insert("UPDATESITE", "");
 
@@ -390,22 +413,7 @@ void Application::slotCreatePkgbuild()
     pkgbuild.replace("$NOEXTRACT", noextract.toUtf8());
     pkgbuild.replace("$MD5SUMS", md5sums.toUtf8());
 
-    QFile output;
-    output.setFileName("PKGBUILD");
-    if(!output.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-        qDebug() << "Could not open the file in write mode." << endl;
-        std::exit(1);
-    }
-    QTextStream fout(&output);
-    fout << pkgbuild << endl;
-    output.close();
-
-    qDebug() << "PKGBUILD created";
-
-    // if we are in console mode quit now
-    if(!m_gui_mode)
-        quit();
+    emit pkgbuildGenerated(pkgbuild);
 }
 
 void Application::slotUpdatesiteChanged(QString updateSite)
@@ -439,6 +447,85 @@ void Application::slotHeadRequestFinished(QNetworkReply *reply)
 void Application::slotSetPkgbuildVariables(QHash<QString, QString> input)
 {
     m_pkgbuild_variables.unite(input);
+}
+
+void Application::slotSave(QByteArray pkgbuild)
+{
+    QFile output;
+    output.setFileName("PKGBUILD");
+    if(!output.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        qDebug() << "Could not open the file in write mode." << endl;
+        std::exit(1);
+    }
+    QTextStream fout(&output);
+    fout << pkgbuild << endl;
+    output.close();
+
+    qDebug() << "PKGBUILD created";
+
+    emit pkgbuildSaved();
+}
+
+void Application::slotPackage()
+{
+    QProcess *process = new QProcess(this);
+    process->start("makepkg", QStringList("-s"));
+    connect(process, SIGNAL(error(QProcess::ProcessError)),
+            this, SLOT(slotProcessError(QProcess::ProcessError)));
+    coneect(process, SIGNAL(finished(int)),
+            this, SLOT(slotProcessFinished(int)));
+}
+
+void Application::slotSourcePackage()
+{
+    QProcess *process = new QProcess(this);
+    process->start("makepkg", QStringList("-S"));
+    connect(process, SIGNAL(error(QProcess::ProcessError)),
+            this, SLOT(slotProcessError(QProcess::ProcessError)));
+    coneect(process, SIGNAL(finished(int)),
+            this, SLOT(slotProcessFinished(int)));
+}
+
+void Application::slotProcessError(QProcess::ProcessError err)
+{
+    switch(err)
+    {
+        case QProcess::FailedToStart:
+
+            qDebug() << "Failed to start";
+            break;
+
+        case QProcess::Crashed:
+
+            qDebug() << "Crashed";
+            break;
+
+        case QProcess::Timedout:
+
+            qDebug() << "Timedout";
+            break;
+
+        case QProcess::WriteError:
+
+            qDebug() << "Write error";
+            break;
+
+        case QProcess::ReadError:
+
+            qDebug() << "Read error";
+            break;
+
+        case QProcess::UnknownError:
+
+            qDebug() << "Unknown error";
+            break;
+    }
+}
+
+void Application::slotProcessFinished(int exitCode)
+{
+    qDebug() << "Finished the packaging";
 }
 
 /***************************

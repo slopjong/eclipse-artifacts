@@ -6,6 +6,7 @@
 #include <QtCore/QBuffer>
 #include <QtCore/QStringList>
 #include <QtCore/QHash>
+#include <QtCore/QProcess>
 
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkReply>
@@ -69,6 +70,8 @@ signals:
     void updatesiteLoading();
     void progressMaximumChanged(int max);
     void progressChanged(int amount);
+    void pkgbuildGenerated(QByteArray pkgbuild);
+    void pkgbuildSaved();
     
 public slots:
 
@@ -81,6 +84,10 @@ private slots:
     void slotUpdatesiteChanged(QString updateSite);
     void slotHeadRequestFinished(QNetworkReply *reply);
     void slotSetPkgbuildVariables(QHash<QString, QString> input);
+    void slotSave(QByteArray pkgbuild);
+    void slotPackage();
+    void slotSourcePackage();
+    void slotProcessError(QProcess::ProcessError);
     
 };
 

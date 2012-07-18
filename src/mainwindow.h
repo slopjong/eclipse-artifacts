@@ -35,6 +35,7 @@ public slots:
     void slotProgressChanged(int progress);
     void slotProgressMaxChanged(int max);
     void slotFileDownloading(QString fileName);
+    void slotPkgbuildGenerated(QByteArray pkgbuild);
 
 private slots:
 
@@ -42,11 +43,18 @@ private slots:
     void slotGenerateButtonClicked();
     void slotWaitOnValid();
     void slotResize();
+    void slotInputMaskButtonClicked();
+    void slotSaveButtonclicked();
+    void slotSourcePackageButtonClicked();
+    void slotPackageButtonClicked();
 
 signals:
     void updatesiteChanged(QString updateSite);
     void generatePkgbuild();
     void inputChanged(QHash<QString, QString>);
+    void save(QByteArray pkgbuild);
+    void sourcePackage();
+    void package();
 };
 
 #endif // MAINWINDOW_H

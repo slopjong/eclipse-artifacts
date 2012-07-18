@@ -12,8 +12,18 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     ui->generateButton->setHidden(true);
 
-    connect(ui->inputUpdatesite, SIGNAL(textChanged(QString)), this, SLOT(slotUpdatesiteChanged(QString)));
-    connect(ui->generateButton, SIGNAL(clicked()), this, SLOT(slotGenerateButtonClicked()));
+    connect(ui->inputUpdatesite, SIGNAL(textChanged(QString)),
+            this, SLOT(slotUpdatesiteChanged(QString)));
+    connect(ui->generateButton, SIGNAL(clicked()),
+            this, SLOT(slotGenerateButtonClicked()));
+    connect(ui->inputMaskButton, SIGNAL(clicked()),
+            this, SLOT(slotInputMaskButtonClicked()));
+    connect(ui->saveButton, SIGNAL(clicked()),
+            this, SLOT(slotSaveButtonclicked()));
+    connect(ui->packageButton, SIGNAL(clicked()),
+            this, SLOT(slotPackageButtonClicked()));
+    connect(ui->sourcePackageButton, SIGNAL(clicked()),
+            this, SLOT(slotSourcePackageButtonClicked()));
 }
 
 MainWindow::~MainWindow()
@@ -70,6 +80,12 @@ void MainWindow::slotFileDownloading(QString fileName)
     ui->fileDownloading->setText(fileName.prepend("Downloading "));
 }
 
+void MainWindow::slotPkgbuildGenerated(QByteArray pkgbuild)
+{
+    ui->stackedWidget->setCurrentIndex(2);
+    ui->pkgbuildEdit->setText(pkgbuild);
+}
+
 void MainWindow::initInput(QHash<QString, QString> input)
 {
     ui->iPkgrel->setText(input.value("PKGREL"));
@@ -118,4 +134,26 @@ void MainWindow::slotResize()
 
     if(s.height() == sizeHint().height())
         resizeTimer->stop();
+}
+
+void MainWindow::slotInputMaskButtonClicked()
+{
+    ui->stackedWidget->setCurrentIndex(1);
+}
+
+void MainWindow::slotSaveButtonclicked()
+{
+    emit save(ui->pkgbuildEdit->toPlainText().toLocal8Bit());
+}
+
+
+void MainWindow::slotPackageButtonClicked()
+{
+    emit package();
+}
+
+
+void MainWindow::slotSourcePackageButtonClicked()
+{
+    emit sourcePackage();
 }
